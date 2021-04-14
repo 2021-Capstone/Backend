@@ -7,6 +7,8 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.util.List;
 
 @Repository
@@ -16,6 +18,10 @@ public class UserRepository {
     private final EntityManager em;
 
     public void save(User user){
+        //비밀번호 해시 저장(SHA256)
+        String encryptedPassword = Encrypt(user.getPassword());
+        user.setPassword(encryptedPassword);
+
         em.persist(user);
     }
 
@@ -38,6 +44,25 @@ public class UserRepository {
         return em.createQuery("select u from User as u where u.email = :email", User.class)
                 .setParameter("email", email)
                 .getResultList();
+    }
+
+    private String Encrypt(String password){
+        try{
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[]hash = digest.digest(password.getBytes(StandardCharsets.UTF_8));
+            StringBuffer hexString = new StringBuffer();
+
+            for(int i = 0; i < hash.length; i++){
+                String hex = Integer.toHexString(0xff & hash[i]);
+                if(hex.length() == 1)
+                    hexString.append('0');
+                hexString.append(hex);
+            }
+
+            return hexString.toString();
+        }catch (Exception e){
+            throw new RuntimeException(e);
+        }
     }
 }
 
