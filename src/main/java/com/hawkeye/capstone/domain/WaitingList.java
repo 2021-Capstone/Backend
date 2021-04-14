@@ -12,17 +12,14 @@ public class WaitingList {
 
     @Id
     @GeneratedValue
+    @Column(name = "waiting_list_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id")
     private Group group;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
-
-    private int Count;
+    private int count;
 
     @Enumerated(EnumType.STRING)
     private WaitingStatus status;

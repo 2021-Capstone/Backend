@@ -8,19 +8,18 @@ import javax.persistence.*;
 @Entity
 @Getter
 @Setter
-public class HostHistory {
+public class Queue {
 
     @Id
     @GeneratedValue
-    @Column(name = "host_history_id")
+    @Column(name = "queue_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "session_id")
-    private Session session;
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "waiting_list_id")
+    private WaitingList waitingList;
 }

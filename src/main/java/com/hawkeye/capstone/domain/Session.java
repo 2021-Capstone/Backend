@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -18,4 +19,13 @@ public class Session {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id")
     private Group group;
+
+    @Column(name = "session_start_time")
+    private LocalDateTime startTime;
+
+    @Column(name = "session_end_time")
+    private LocalDateTime endTime;
+
+    @Column(name = "session_ongoing_time")
+    private LocalDateTime ongoingTime;
 }

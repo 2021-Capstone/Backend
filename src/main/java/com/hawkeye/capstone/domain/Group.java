@@ -4,10 +4,13 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
 @Setter
+@Table(name = "Groups")
 public class Group {
 
     @Id
@@ -29,9 +32,9 @@ public class Group {
     @Column(name = "is_on_air")
     private boolean onAir;
 
-    @OneToMany(mappedBy = "group")
+    @OneToOne(mappedBy = "group")
     private WaitingList waitingList;
 
     @OneToMany(mappedBy = "group")
-    private Session session;
+    private List<Session> sessionList = new ArrayList<>();
 }

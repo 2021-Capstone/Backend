@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import javax.persistence.*;
 import java.sql.Blob;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -30,6 +32,6 @@ public class User {
     private String name;
 
     @OneToMany(mappedBy = "user")
-    private WaitingList waitingList;
+    private List<Queue> queueList = new ArrayList<>();
 
 }
