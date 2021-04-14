@@ -1,5 +1,6 @@
 package com.hawkeye.capstone;
 
+import com.hawkeye.capstone.domain.User;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
