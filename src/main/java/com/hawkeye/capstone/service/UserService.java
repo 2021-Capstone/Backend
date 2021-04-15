@@ -19,11 +19,19 @@ public class UserService {
      * 회원 가입
      */
     @Transactional
-    public Long join(User user){
+    public Long join(User user, String passwordConfirm){
 
         validateDuplicateUser(user);
+        validatePassword(user, passwordConfirm);
         userRepository.save(user);
         return user.getId();
+    }
+
+    private void validatePassword(User user, String passwordConfirm) {
+
+        if(!user.getPassword().equals(passwordConfirm)){
+            throw new IllegalStateException("비밀번호가 일치하지 않습니다. ");
+        }
     }
 
     /**
