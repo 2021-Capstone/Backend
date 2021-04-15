@@ -18,7 +18,7 @@ public class UserRepository {
     private final EntityManager em;
 
     public void save(User user){
-        //비밀번호 해시 저장(SHA256)
+
         String encryptedPassword = Encrypt(user.getPassword());
         user.setPassword(encryptedPassword);
 
@@ -46,6 +46,9 @@ public class UserRepository {
                 .getResultList();
     }
 
+    /**
+     * 비밀번호 해시 변경(SHA256)
+     */
     private String Encrypt(String password){
         try{
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
