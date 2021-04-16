@@ -21,7 +21,6 @@ public class UserRepository {
 
         String encryptedPassword = Encrypt(user.getPassword());
         user.setPassword(encryptedPassword);
-
         em.persist(user);
     }
 

@@ -27,12 +27,10 @@ public class GuestHistory {
     @JoinColumn(name = "host_history_id")
     private HostHistory hostHistory;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "roll_graph_id")
+    @Embedded
     private RollGraph rollGraph;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "yaw_graph_id")
+    @Embedded
     private YawGraph yawGraph;
 
     private boolean attendance;
