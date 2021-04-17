@@ -2,12 +2,10 @@ package com.hawkeye.capstone.api;
 
 import com.hawkeye.capstone.domain.User;
 import com.hawkeye.capstone.service.UserService;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
@@ -29,6 +27,18 @@ public class UserApiController {
 
         Long id = userService.join(user, request.passwordConfirm);
         return new CreateUserResponse(id);
+    }
+
+    // 회원 정보 수정 - 마이페이지  /  ** 일단 email, 이름 수정 ** / 추후에  프로필이미지 추가해야 함
+    @PutMapping("/api/mypage/revise/{id}")
+    public UpdateUserResponse updateMember(@PathVariable("id") Long id,
+                                           @RequestBody @Valid UpdateUserRequest request){
+
+        userService.update(id, request.getEmail(), request.getName());
+
+        User findUser = userService.findOne(id);
+
+        return new UpdateUserResponse(findUser.getId(), findUser.getEmail(), findUser.getName());
     }
 
     @Data
@@ -54,5 +64,23 @@ public class UserApiController {
 
         @NotEmpty
         private String passwordConfirm;
+    }
+
+    @Data
+    static class UpdateUserRequest {  // 정보 수정 시
+
+        @NotEmpty
+        private String email;
+
+        @NotEmpty
+        private String name;
+    }
+
+    @Data
+    @AllArgsConstructor
+    static class UpdateUserResponse {
+        private Long id;
+        private String email;
+        private String name;
     }
 }
