@@ -53,4 +53,11 @@ public class UserService {
         user.setEmail(email);
         user.setName(name);
     }
+
+    /**
+     * 회원 조회
+     */
+    public User findOne(Long userId){
+        return userRepository.findOne(userId);
+    }
 }

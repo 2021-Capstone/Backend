@@ -2,12 +2,10 @@ package com.hawkeye.capstone.api;
 
 import com.hawkeye.capstone.domain.User;
 import com.hawkeye.capstone.service.UserService;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
@@ -29,6 +27,47 @@ public class UserApiController {
 
         Long id = userService.join(user, request.passwordConfirm);
         return new CreateUserResponse(id);
+    }
+
+    //회원 조회
+    @GetMapping("/api/mypage/{userId}")
+    public UserDto userSearch(@PathVariable("userId") Long userId){
+
+        User findUser = userService.findOne(userId);
+        //User를 UserDto로 변환
+        UserDto userDto = new UserDto(findUser.getEmail(), findUser.getName(), findUser.getPassword());
+        return userDto;
+    }
+
+    //회원 정보 수정
+    @PatchMapping("/api/mypage/{userId}")
+    public UpdateUserResponse updateUser(@PathVariable("userId") Long userId, @RequestBody @Valid UpdateUserRequest request){
+
+        userService.update(userId, request.getEmail(), request.getName());
+        User findUser = userService.findOne(userId);
+        return new UpdateUserResponse(findUser.getId());
+    }
+
+    @Data
+    @AllArgsConstructor
+    static class UpdateUserResponse {
+        private Long id;
+    }
+
+    @Data
+    static class UpdateUserRequest {
+        private String name;
+        private String email;
+    }
+
+    @Data
+    @AllArgsConstructor
+    static class UserDto{
+
+        private String email;
+        private String name;
+        private String password;
+
     }
 
     @Data
