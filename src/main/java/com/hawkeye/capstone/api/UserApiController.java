@@ -83,4 +83,24 @@ public class UserApiController {
         private String email;
         private String name;
     }
+
+    /**
+     * 회원 정보 조회 - 마이페이지
+     */
+    @GetMapping("api/mypage/{id}")
+    public UserDTO getUserInfo(@PathVariable("id")Long id){
+
+        User findUser = userService.findOne(id);
+
+        return new UserDTO(findUser.getEmail(), findUser.getName(), findUser.getPassword());
+    }
+
+
+    @Data
+    @AllArgsConstructor
+    static class UserDTO{  // user id값 통해서 이메일, 이름, 패스워드(?) 조회
+        private String email;
+        private String name;
+        private String password;
+    }
 }
