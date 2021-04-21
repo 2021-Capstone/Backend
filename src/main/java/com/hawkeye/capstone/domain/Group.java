@@ -32,6 +32,9 @@ public class Group {
     @Column(name = "is_on_air")
     private boolean onAir;
 
+    @Column(name = "host_id")
+    private Long hostId;
+
     @OneToOne(mappedBy = "group")
     private WaitingList waitingList;
 

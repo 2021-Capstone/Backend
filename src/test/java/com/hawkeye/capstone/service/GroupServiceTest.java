@@ -62,4 +62,18 @@ public class GroupServiceTest {
         //then
         assertEquals(group, groupService.groupByUser(user.getId()).get(0));
     }
+
+    @Test
+    public void 입장코드_생성() throws Exception{
+        //given
+        User user = new User();
+        user.setName("professor");
+        user.setPassword("123");
+        user.setEmail("alahoon@naver.com");
+
+        //when
+        userService.join(user, "123");
+        Long group = groupService.createGroup(new Group(), user);
+
+    }
 }
