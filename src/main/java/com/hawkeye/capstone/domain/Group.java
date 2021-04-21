@@ -32,6 +32,9 @@ public class Group {
     @Column(name = "is_on_air")
     private boolean onAir;
 
+    @Column(name = "host_id")  // 해당 그룹의 호스트가 누구인지지
+    private Long host_id;
+
     @OneToOne(mappedBy = "group")
     private WaitingList waitingList;
 
