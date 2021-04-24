@@ -30,6 +30,12 @@ public class UserApiController {
         return new CreateUserResponse(id);
     }
 
+    //로그인
+    @PostMapping("/api/auth/login")
+    public LogInResponse logIn(@RequestBody @Valid LogInRequest request){
+        return new LogInResponse(userService.loadUserByEmail(request.getEmail(), request.getPassword()).getId());
+    }
+
     //회원 조회
     @GetMapping("/api/mypage/{userId}")
     public UserDto userSearch(@PathVariable("userId") Long userId){
@@ -47,6 +53,20 @@ public class UserApiController {
         userService.update(userId, request.getEmail(), request.getName());
         User findUser = userService.findOne(userId);
         return new UpdateUserResponse(findUser.getId());
+    }
+
+    @Data
+    @AllArgsConstructor
+    static class LogInResponse{
+        private Long id;
+    }
+
+    @Data
+    static class LogInRequest{
+        @NotEmpty
+        private String email;
+        @NotEmpty
+        private String password;
     }
 
     @Data
