@@ -26,4 +26,8 @@ public class GroupRepository {
         return em.createQuery("select g from Group as g", Group.class)
                 .getResultList();
     }
+
+    public void delete(Group group){
+        em.remove(group);
+    }
 }

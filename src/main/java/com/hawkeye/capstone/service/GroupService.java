@@ -26,6 +26,7 @@ public class GroupService {
     private final UserService userService;
 
     //그룹 생성
+    @Transactional
     public Long createGroup(Group group, User user) {
         group.setHostId(user.getId());
         group.setCode(createEnterCode(user.getId()));
@@ -74,6 +75,12 @@ public class GroupService {
         }
 
         return groupList;
+    }
+
+    //그룹 삭제
+    @Transactional
+    public void deleteGroup(Long groupId){
+        groupRepository.delete(groupRepository.findOne(groupId));
     }
 }
 
