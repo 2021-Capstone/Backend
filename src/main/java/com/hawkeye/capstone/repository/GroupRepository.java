@@ -28,6 +28,7 @@ public class GroupRepository {
     }
 
     public void delete(Group group){
+        System.out.println("===============");
         em.remove(group);
     }
 }
