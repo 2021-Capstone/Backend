@@ -52,7 +52,7 @@ public class UserApiController {
 
         userService.update(userId, request.getEmail(), request.getName());
         User findUser = userService.findOne(userId);
-        return new UpdateUserResponse(findUser.getId());
+        return new UpdateUserResponse(findUser.getId(), findUser.getEmail());
     }
 
     @Data
@@ -73,6 +73,7 @@ public class UserApiController {
     @AllArgsConstructor
     static class UpdateUserResponse {
         private Long id;
+        private String name;
     }
 
     @Data

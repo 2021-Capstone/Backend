@@ -63,6 +63,11 @@ public class GroupService {
         }
     }
 
+    //그룹 찾기
+    public Group findOne(Long groupId){
+        return groupRepository.findOne(groupId);
+    }
+
     //유저가 속해 있는 그룹 전부 찾기
     public List<Group> groupByUser(Long userId) {
         List<Queue> queueByUserList = queueRepository.findByUser(userId);
@@ -81,6 +86,15 @@ public class GroupService {
     @Transactional
     public void deleteGroup(Long groupId){
         groupRepository.delete(groupRepository.findOne(groupId));
+    }
+
+    //그룹 정보 변경
+    @Transactional
+    public void update(Long groupId, String groupName, int absenceTime, int alertDuration) {
+        Group findGroup = groupRepository.findOne(groupId);
+        findGroup.setName(groupName);
+        findGroup.setAbsenceTime(absenceTime);
+        findGroup.setAlertDuration(alertDuration);
     }
 }
 
