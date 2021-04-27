@@ -1,7 +1,9 @@
 package com.hawkeye.capstone.api;
 
 import com.hawkeye.capstone.domain.User;
+import com.hawkeye.capstone.service.GroupService;
 import com.hawkeye.capstone.service.UserService;
+import com.hawkeye.capstone.service.WaitingListService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -35,9 +37,6 @@ public class UserApiController {
     public LogInResponse logIn(@RequestBody @Valid LogInRequest request){
         return new LogInResponse(userService.loadUserByEmail(request.getEmail(), request.getPassword()).getId());
     }
-
-    //로그아웃
-
 
     //회원 조회
     @GetMapping("/api/mypage/{userId}")

@@ -42,7 +42,6 @@ public class GroupServiceTest {
         user.setPassword("123");
 
         WaitingList waitingList = new WaitingList();
-        waitingList.setStatus(WaitingStatus.ACCEPT);
 
         Group group = new Group();
         group.setName("gg");
@@ -50,6 +49,7 @@ public class GroupServiceTest {
 
         Queue queue = new Queue();
         queue.setUser(user);
+        queue.setStatus((WaitingStatus.ACCEPT));
         queue.setWaitingList(waitingList);
 
 

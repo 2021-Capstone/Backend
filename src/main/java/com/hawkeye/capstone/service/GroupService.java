@@ -76,7 +76,7 @@ public class GroupService {
         List<Group> groupList = new ArrayList<>();
 
         for (Queue queue : queueByUserList) {
-            if (queue.getWaitingList().getStatus() == WaitingStatus.ACCEPT)
+            if (queue.getStatus() == WaitingStatus.ACCEPT)
                 groupList.add(queue.getWaitingList().getGroup());
         }
 
@@ -91,11 +91,27 @@ public class GroupService {
 
     //그룹 정보 변경
     @Transactional
-    public void update(Long groupId, String groupName, int absenceTime, int alertDuration) {
+    public void updateGroup(Long groupId, String groupName, int absenceTime, int alertDuration) {
         Group findGroup = groupRepository.findOne(groupId);
         findGroup.setName(groupName);
         findGroup.setAbsenceTime(absenceTime);
         findGroup.setAlertDuration(alertDuration);
+    }
+
+    //그룹 입장 신청
+    @Transactional
+    public Long joinGroup(User user, String groupEnterCode){
+        if(groupRepository.findByCode(groupEnterCode).isEmpty()){
+            throw new IllegalStateException("해당 코드는 유효하지 않습니다.");
+        }
+        else{
+            Group findGroup = groupRepository.findByCode(groupEnterCode).get(0);
+            Queue queue = new Queue();
+            queueRepository.init(queue, user, findGroup.getWaitingList());
+            queueRepository.save(queue);
+
+            return findGroup.getId();
+        }
     }
 }
 

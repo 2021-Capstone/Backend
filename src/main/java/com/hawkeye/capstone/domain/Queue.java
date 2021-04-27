@@ -25,4 +25,5 @@ public class Queue {
 
     @Enumerated(EnumType.STRING)
     private WaitingStatus status;
+
 }

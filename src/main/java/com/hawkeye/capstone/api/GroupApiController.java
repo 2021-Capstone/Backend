@@ -30,18 +30,26 @@ public class GroupApiController {
 
         //임시 호스트 생성
         User user = new User();
+        user.setName("김지훈");
         user.setEmail("alahoon@naver.com");
         user.setPassword("123");
         userService.join(user, "123");
 
         Long id = groupService.createGroup(group, userService.findOne(request.getHostId()));
-        return new CreateGroupResponse(id);
+        return new CreateGroupResponse(id, group.getCode());
     }
 
     //그룹 삭제
     @DeleteMapping("/api/group/deleteGroup/{groupId}")
     public void deleteGroup(@PathVariable("groupId") Long groupId) {
         groupService.deleteGroup(groupId);
+    }
+
+    //그룹 입장 신청
+    @PostMapping("/api/group/joinGroup/{userId}")
+    public JoinGroupResponse joinGroup(@PathVariable("userId") Long userId, @RequestBody JoinGroupRequest request){
+        Long groupId = groupService.joinGroup(userService.findOne(userId), request.getGroupEnterCode());
+        return new JoinGroupResponse(groupId);
     }
 
     //그룹 정보 확인
@@ -55,11 +63,21 @@ public class GroupApiController {
     //그룹 정보 수정
     @PatchMapping("/api/group/getGroupInfo/{groupId}")
     public UpdateGroupInfoResponse updateGroupInfo(@PathVariable("groupId") Long groupId, @RequestBody UpdateGroupInfoRequest request) {
-        groupService.update(groupId, request.getName(), request.getAbsenceTime(), request.getAlertDuration());
+        groupService.updateGroup(groupId, request.getName(), request.getAbsenceTime(), request.getAlertDuration());
         Group findGroup = groupService.findOne(groupId);
         return new UpdateGroupInfoResponse(findGroup.getId(), findGroup.getName(), findGroup.getAbsenceTime(), findGroup.getAlertDuration());
     }
 
+    @Data
+    @AllArgsConstructor
+    static class JoinGroupResponse{
+        private Long id;
+    }
+
+    @Data
+    static class JoinGroupRequest{
+        private String groupEnterCode;
+    }
 
     @Data
     @AllArgsConstructor
@@ -81,6 +99,7 @@ public class GroupApiController {
     @AllArgsConstructor
     static class CreateGroupResponse {
         private Long id;
+        private String groupEnterCode;
     }
 
     @Data
