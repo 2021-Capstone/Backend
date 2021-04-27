@@ -60,6 +60,7 @@ public class GroupApiController {
         return new UpdateGroupInfoResponse(findGroup.getId(), findGroup.getName(), findGroup.getAbsenceTime(), findGroup.getAlertDuration());
     }
 
+
     @Data
     @AllArgsConstructor
     static class UpdateGroupInfoResponse{

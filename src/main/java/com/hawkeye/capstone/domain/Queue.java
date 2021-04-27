@@ -22,4 +22,7 @@ public class Queue {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "waiting_list_id")
     private WaitingList waitingList;
+
+    @Enumerated(EnumType.STRING)
+    private WaitingStatus status;
 }

@@ -36,6 +36,9 @@ public class UserApiController {
         return new LogInResponse(userService.loadUserByEmail(request.getEmail(), request.getPassword()).getId());
     }
 
+    //로그아웃
+
+
     //회원 조회
     @GetMapping("/api/mypage/{userId}")
     public UserDto userSearch(@PathVariable("userId") Long userId){

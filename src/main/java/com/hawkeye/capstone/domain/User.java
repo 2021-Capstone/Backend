@@ -31,7 +31,4 @@ public class User {
     @Column(name = "user_name")
     private String name;
 
-    @OneToMany(mappedBy = "user")
-    private List<Queue> queueList = new ArrayList<>();
-
 }

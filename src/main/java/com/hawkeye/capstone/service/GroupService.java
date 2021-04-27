@@ -1,9 +1,6 @@
 package com.hawkeye.capstone.service;
 
-import com.hawkeye.capstone.domain.Group;
-import com.hawkeye.capstone.domain.Queue;
-import com.hawkeye.capstone.domain.User;
-import com.hawkeye.capstone.domain.WaitingStatus;
+import com.hawkeye.capstone.domain.*;
 import com.hawkeye.capstone.repository.GroupRepository;
 import com.hawkeye.capstone.repository.QueueRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +21,7 @@ public class GroupService {
     private final GroupRepository groupRepository;
     private final QueueRepository queueRepository;
     private final UserService userService;
+    private final WaitingListService waitingListService;
 
     //그룹 생성
     @Transactional
@@ -31,6 +29,9 @@ public class GroupService {
         group.setHostId(user.getId());
         group.setCode(createEnterCode(user.getId()));
         groupRepository.save(group);
+
+        WaitingList waitingList = new WaitingList();
+        waitingListService.createWaitingList(waitingList, group);
         return group.getId();
     }
 
