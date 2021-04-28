@@ -6,6 +6,7 @@ import com.hawkeye.capstone.domain.WaitingList;
 import com.hawkeye.capstone.domain.WaitingStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import java.util.List;
@@ -40,5 +41,11 @@ public class QueueRepository {
 
         return findQueueList;
 
+    }
+
+    @Transactional
+    public void setStatus(Queue queue, WaitingStatus waitingStatus){
+        Queue one = findOne(queue.getId());
+        one.setStatus(waitingStatus);
     }
 }

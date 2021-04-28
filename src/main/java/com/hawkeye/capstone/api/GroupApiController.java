@@ -1,16 +1,22 @@
 package com.hawkeye.capstone.api;
 
 import com.hawkeye.capstone.domain.Group;
+import com.hawkeye.capstone.domain.Queue;
 import com.hawkeye.capstone.domain.User;
+import com.hawkeye.capstone.domain.WaitingStatus;
+import com.hawkeye.capstone.repository.QueueRepository;
 import com.hawkeye.capstone.service.GroupService;
 import com.hawkeye.capstone.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.Column;
+import javax.persistence.EntityManager;
 import javax.validation.constraints.NotEmpty;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,6 +24,7 @@ public class GroupApiController {
 
     private final GroupService groupService;
     private final UserService userService;
+    private final QueueRepository queueRepository;
 
     //그룹 생성
     @PostMapping("/api/group/createGroup")
@@ -52,6 +59,25 @@ public class GroupApiController {
         return new JoinGroupResponse(groupId);
     }
 
+    //그룹 입장 수락
+    @PatchMapping("/api/group/allowMember/{groupId}")
+    public AllowMemberResponse allowMember(@PathVariable("groupId") Long groupId, @RequestBody AllowMemberRequest request){
+
+        User findUser = userService.findByEmail(request.getEmail());
+        //해당 유저가 속한 Queue 전부 조회
+        List<Queue> queueList = queueRepository.findByUser(findUser.getId());
+        //각 Queue가 입장 신청을 한 그룹의 waitingList인지 조회
+        for (Queue queue : queueList) {
+            if(queue.getWaitingList().getGroup().getId() == groupId){
+                //변경 감지
+                queueRepository.setStatus(queue, WaitingStatus.ACCEPT);
+                //해당 Queue는 WaitingList에서 빠짐
+            }
+        }
+
+        return new AllowMemberResponse(groupId);
+    }
+
     //그룹 정보 확인
     @GetMapping("/api/group/getGroupInfo/{groupId}")
     public GroupDto getGroupInfo(@PathVariable("groupId") Long groupId) {
@@ -61,11 +87,23 @@ public class GroupApiController {
     }
 
     //그룹 정보 수정
-    @PatchMapping("/api/group/getGroupInfo/{groupId}")
+    @PatchMapping("/api/group/editGroupInfo/{groupId}")
     public UpdateGroupInfoResponse updateGroupInfo(@PathVariable("groupId") Long groupId, @RequestBody UpdateGroupInfoRequest request) {
         groupService.updateGroup(groupId, request.getName(), request.getAbsenceTime(), request.getAlertDuration());
         Group findGroup = groupService.findOne(groupId);
         return new UpdateGroupInfoResponse(findGroup.getId(), findGroup.getName(), findGroup.getAbsenceTime(), findGroup.getAlertDuration());
+    }
+
+    //그룹의 유저 조회
+    @Data
+    @AllArgsConstructor
+    static class AllowMemberResponse{
+        private Long id;
+    }
+
+    @Data
+    static class AllowMemberRequest{
+        private String email;
     }
 
     @Data

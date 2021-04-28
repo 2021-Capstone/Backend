@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
@@ -19,4 +20,5 @@ public class WaitingListRepository {
         WaitingList findWaitingList = em.find(WaitingList.class, id);
         return findWaitingList;
     }
+
 }

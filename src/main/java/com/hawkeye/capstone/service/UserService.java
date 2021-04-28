@@ -65,6 +65,9 @@ public class UserService {
         return userRepository.findOne(userId);
     }
 
+    public User findByEmail(String email){
+        return userRepository.findByEmail(email).get(0);
+    }
     /**
      * 로그인
      */
