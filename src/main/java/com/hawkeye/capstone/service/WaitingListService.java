@@ -23,4 +23,9 @@ public class WaitingListService {
         waitingList.setGroup(group);
         waitingListRepository.save(waitingList);
     }
+
+    @Transactional
+    public void updateCount(WaitingList waitingList, int value){
+        waitingList.countPlus(value);
+    }
 }

@@ -25,37 +25,41 @@ public class WaitingListApiController {
     private final UserService userService;
     private final WaitingListService waitingListService;
 
-    //host 입장에서 WaitingList 목록
+    //host 입장에서 WaitingList 목록 가져오기(status가 wait인 것들만)
     @GetMapping("/api/WaitingList/getWaitingList/{groupId}")
-    public WaitingListDto getWaitingList(@PathVariable Long groupId){
+    public WaitingListDto getWaitingList(@PathVariable Long groupId) {
         WaitingList waitingList = groupService.findOne(groupId).getWaitingList();
 
         return new WaitingListDto(waitingList);
     }
 
     @Data
-    static class WaitingListDto{
+    static class WaitingListDto {
 
         private int count;
         private String groupName;
         private List<QueueDto> queueList;
 
-        public WaitingListDto(WaitingList waitingList){
+        public WaitingListDto(WaitingList waitingList) {
             count = waitingList.getCount();
-            groupName =waitingList.getGroup().getName();
-            queueList = waitingList.getQueueList().stream()
+            groupName = waitingList.getGroup().getName();
+            List<QueueDto> queueListAll = waitingList.getQueueList().stream()
                     .map(queue -> new QueueDto(queue))
                     .collect(Collectors.toList());
+            for (QueueDto queueDto : queueListAll) {
+                if (queueDto.getWaitingStatus() == WaitingStatus.WAIT)
+                    queueList.add(queueDto);
+            }
         }
     }
 
     @Data
-    static class QueueDto{
+    static class QueueDto {
         private String userName;
         private String userEmail;
         private WaitingStatus waitingStatus;
 
-        public QueueDto(Queue queue){
+        public QueueDto(Queue queue) {
             userName = queue.getUser().getName();
             userEmail = queue.getUser().getEmail();
             waitingStatus = queue.getStatus();

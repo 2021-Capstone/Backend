@@ -24,4 +24,8 @@ public class WaitingList {
 
     @OneToMany(mappedBy = "waitingList")
     private List<Queue> queueList;
+
+    public void countPlus(int plus){
+        count += plus;
+    }
 }

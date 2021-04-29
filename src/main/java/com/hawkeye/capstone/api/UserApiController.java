@@ -1,6 +1,7 @@
 package com.hawkeye.capstone.api;
 
 import com.hawkeye.capstone.domain.User;
+import com.hawkeye.capstone.dto.UserDto;
 import com.hawkeye.capstone.service.GroupService;
 import com.hawkeye.capstone.service.UserService;
 import com.hawkeye.capstone.service.WaitingListService;
@@ -44,7 +45,7 @@ public class UserApiController {
 
         User findUser = userService.findOne(userId);
         //User를 UserDto로 변환
-        UserDto userDto = new UserDto(findUser.getEmail(), findUser.getName(), findUser.getPassword());
+        UserDto userDto = new UserDto(findUser.getEmail(), findUser.getName());
         return userDto;
     }
 
@@ -82,16 +83,6 @@ public class UserApiController {
     static class UpdateUserRequest {
         private String name;
         private String email;
-    }
-
-    @Data
-    @AllArgsConstructor
-    static class UserDto{
-
-        private String email;
-        private String name;
-        private String password;
-
     }
 
     @Data

@@ -17,9 +17,10 @@ public class QueueRepository {
 
     private final EntityManager em;
     private final UserRepository userRepository;
+    private final GroupRepository groupRepository;
 
     public void init(Queue queue, User user, WaitingList waitingList){
-        waitingList.setCount(waitingList.getCount() + 1);
+        waitingList.countPlus(1);
         queue.setUser(user);
         queue.setWaitingList(waitingList);
         queue.getWaitingList().getQueueList().add(queue);
@@ -41,6 +42,17 @@ public class QueueRepository {
 
         return findQueueList;
 
+    }
+
+    //큐를 조회할 때 유저도 함께 조회
+    public List<Queue> findByGroupWithUser(Long groupId){
+        List<Queue> findQueueList = em.createQuery("select q from Queue q " +
+                "join fetch q.user " +
+                "where q.waitingList = :waitingList", Queue.class)
+                .setParameter("waitingList", groupRepository.findOne(groupId).getWaitingList())
+                .getResultList();
+
+        return findQueueList;
     }
 
     @Transactional
