@@ -1,9 +1,6 @@
 package com.hawkeye.capstone.api;
 
-import com.hawkeye.capstone.domain.Group;
-import com.hawkeye.capstone.domain.Queue;
-import com.hawkeye.capstone.domain.User;
-import com.hawkeye.capstone.domain.WaitingStatus;
+import com.hawkeye.capstone.domain.*;
 import com.hawkeye.capstone.dto.UserDto;
 import com.hawkeye.capstone.repository.QueueRepository;
 import com.hawkeye.capstone.service.GroupService;
@@ -13,11 +10,8 @@ import com.hawkeye.capstone.service.WaitingListService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.Column;
-import javax.persistence.EntityManager;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import java.util.ArrayList;
@@ -140,16 +134,25 @@ public class GroupApiController {
     }
 
     @PostMapping("/api/group/startSession/{groupId}")
-    public StartSessionResponse startSession(@PathVariable("groupId")Long groupId){
-        Group group = groupService.findOne(groupId);
-        Long sessionId = sessionService.createSession(group);
+    public SessionDto startSession(@PathVariable("groupId")Long groupId){
+        Group findGroup = groupService.findOne(groupId);
+        Long sessionId = sessionService.createSession(findGroup);
 
-        return new StartSessionResponse(sessionId);
+        return new SessionDto(sessionId);
     }
+
+    @PatchMapping("/api/group/endSession/{sessionId}")
+    public SessionDto endSession(@PathVariable("sessionId")Long sessionId){
+        Session findSession = sessionService.findOne(sessionId);
+
+        return new SessionDto(sessionService.endSession(findSession));
+
+    }
+
 
     @Data
     @AllArgsConstructor
-    static class StartSessionResponse{
+    static class SessionDto {
         private Long id;
     }
 
