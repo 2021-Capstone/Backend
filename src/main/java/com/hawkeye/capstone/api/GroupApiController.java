@@ -47,7 +47,7 @@ public class GroupApiController {
         user.setPassword("123");
         userService.join(user, "123");
 
-        Long id = groupService.createGroup(group, userService.findOne(request.getHostId()));
+        Long id = groupService.createGroup(group, userService.findOne(request.getUserId()));
         return new CreateGroupResponse(id, group.getCode());
     }
 
@@ -206,7 +206,7 @@ public class GroupApiController {
         private int alertDuration;
         //호스트
         @NotEmpty
-        private long hostId;
+        private long userId;
     }
 
     @Data

@@ -19,14 +19,14 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
-public class WaitingListApiController {
+public class MainPageApiController {
 
     private final GroupService groupService;
     private final UserService userService;
     private final WaitingListService waitingListService;
 
     //host 입장에서 WaitingList 목록 가져오기(status가 wait인 것들만)
-    @GetMapping("/api/WaitingList/getWaitingList/{groupId}")
+    @GetMapping("/api/main/getWaitingList/{groupId}")
     public WaitingListDto getWaitingList(@PathVariable Long groupId) {
         WaitingList waitingList = groupService.findOne(groupId).getWaitingList();
 
