@@ -7,6 +7,7 @@ import com.hawkeye.capstone.domain.WaitingStatus;
 import com.hawkeye.capstone.dto.UserDto;
 import com.hawkeye.capstone.repository.QueueRepository;
 import com.hawkeye.capstone.service.GroupService;
+import com.hawkeye.capstone.service.SessionService;
 import com.hawkeye.capstone.service.UserService;
 import com.hawkeye.capstone.service.WaitingListService;
 import lombok.AllArgsConstructor;
@@ -30,6 +31,7 @@ public class GroupApiController {
     private final UserService userService;
     private final QueueRepository queueRepository;
     private final WaitingListService waitingListService;
+    private final SessionService sessionService;
 
     //그룹 생성
     @PostMapping("/api/group/createGroup")
@@ -137,6 +139,19 @@ public class GroupApiController {
         return groupMemberDto;
     }
 
+    @PostMapping("/api/group/startSession/{groupId}")
+    public StartSessionResponse startSession(@PathVariable("groupId")Long groupId){
+        Group group = groupService.findOne(groupId);
+        Long sessionId = sessionService.createSession(group);
+
+        return new StartSessionResponse(sessionId);
+    }
+
+    @Data
+    @AllArgsConstructor
+    static class StartSessionResponse{
+        private Long id;
+    }
 
     @Data
     @AllArgsConstructor
