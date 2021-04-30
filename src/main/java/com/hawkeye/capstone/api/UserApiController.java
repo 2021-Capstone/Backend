@@ -9,10 +9,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.persistence.EntityManager;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
+import java.io.File;
+import java.io.IOException;
+import java.time.LocalDateTime;
 
 @RestController
 @RequiredArgsConstructor
@@ -60,7 +65,32 @@ public class UserApiController {
 
     //이미지 저장
 //    @PostMapping("/api/image/upload/{userId}")
-//    public Long imageUpload(@PathVariable("userId")Long userId, )
+//    public Long imageUpload(@PathVariable("userId")Long userId, @RequestParam MultipartFile file) throws IOException{
+//
+//        LocalDateTime localDateTime = LocalDateTime.now();
+//        StringBuilder sb = new StringBuilder();
+//
+//        if(file.isEmpty()){
+//            sb.append("none");
+//        }
+//        else{
+//            sb.append(localDateTime);
+//            sb.append(file.getOriginalFilename());
+//        }
+//
+//        if(!file.isEmpty()){
+//            //로컬에 저장
+//            File dest = new File("D:\\Capstone\\Image" + sb.toString());
+//            try{
+//                file.transferTo(dest);
+//            } catch (IllegalStateException e){
+//                e.printStackTrace();
+//            } catch (IOException e){
+//                e.printStackTrace();
+//            }
+//            //DB에 저장
+//        }
+//    }
 
     @Data
     @AllArgsConstructor
