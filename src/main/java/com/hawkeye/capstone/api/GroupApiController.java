@@ -133,6 +133,7 @@ public class GroupApiController {
         return groupMemberDto;
     }
 
+    //수업 시작
     @PostMapping("/api/group/startSession/{groupId}")
     public SessionDto startSession(@PathVariable("groupId")Long groupId){
         Group findGroup = groupService.findOne(groupId);
@@ -141,6 +142,7 @@ public class GroupApiController {
         return new SessionDto(sessionId);
     }
 
+    //수업 종료
     @PatchMapping("/api/group/endSession/{sessionId}")
     public SessionDto endSession(@PathVariable("sessionId")Long sessionId){
         Session findSession = sessionService.findOne(sessionId);

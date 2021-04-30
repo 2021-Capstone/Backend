@@ -25,7 +25,4 @@ public class Session {
 
     @Column(name = "session_end_time")
     private LocalDateTime endTime;
-
-    @Column(name = "session_ongoing_time")
-    private LocalDateTime ongoingTime;
 }

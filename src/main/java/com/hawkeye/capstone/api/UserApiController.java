@@ -58,6 +58,10 @@ public class UserApiController {
         return new UpdateUserResponse(findUser.getId(), findUser.getEmail());
     }
 
+    //이미지 저장
+//    @PostMapping("/api/image/upload/{userId}")
+//    public Long imageUpload(@PathVariable("userId")Long userId, )
+
     @Data
     @AllArgsConstructor
     static class LogInResponse{
