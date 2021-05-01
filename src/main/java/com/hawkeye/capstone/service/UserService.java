@@ -1,11 +1,16 @@
 package com.hawkeye.capstone.service;
 
+import com.hawkeye.capstone.domain.Authority;
 import com.hawkeye.capstone.domain.User;
+import com.hawkeye.capstone.dto.UserDto2;
+import com.hawkeye.capstone.repository.NewUserRepository;
 import com.hawkeye.capstone.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -14,7 +19,8 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository userRepository;
-
+    private final NewUserRepository newUserRepository;
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * 회원 가입
@@ -28,6 +34,10 @@ public class UserService {
         return user.getId();
     }
 
+    // 토큰 테스트 - 회원가입
+    @Transactional
+
+
     private void validatePassword(User user, String passwordConfirm) {
 
         if(!user.getPassword().equals(passwordConfirm)){
@@ -39,41 +49,69 @@ public class UserService {
      * 중복 이메일 체크
      */
     private void validateDuplicateUser(User user) {
-        List<User> findUsers = userRepository.findByEmail(user.getEmail());
-        if(!findUsers.isEmpty()){
-            throw new IllegalStateException("이미 존재하는 이메일입니다. ");
+        List<User> findUserList = userRepository.findByEmail(user.getEmail());
+        if(!findUserList.isEmpty()){
+            throw new IllegalStateException("이미 존재하는 회원입니다. ");
         }
     }
-
-    private void validateDuplicateUser(String newEmail) {   // 이메일 수정 시 새로운 이메일 값 중복 체크
-        List<User> findUsers = userRepository.findByEmail(newEmail);
-        if(!findUsers.isEmpty()){
-            throw new IllegalStateException("이미 존재하는 이메일입니다. 수정 실패 ");
-        }
-    }
-
-
-    /**
-     * 특정 회원 조회
-     */
-    @Transactional(readOnly = true)
-    public User findOne(Long userId){
-        return userRepository.findOne(userId);
-    }
-
 
     /**
      * 회원 정보 수정
      */
     @Transactional //회원 정보 폼에서 데이터 가져와서 수정(변경 감지)
     public void update(Long id, String email, String name){
-
         User user = userRepository.findOne(id);
-
-        validateDuplicateUser(email);  // 변경하려는 이메일의 중복체크
-
         user.setEmail(email);
         user.setName(name);
+    }
 
+    /**
+     * 회원 조회
+     */
+    public User findOne(Long userId){
+        return userRepository.findOne(userId);
+    }
+
+    public User findByEmail(String email){
+        return userRepository.findByEmail(email).get(0);
+    }
+    /**
+     * 로그인
+     */
+    public User loadUserByEmail(String email, String password){
+        User findUser = userRepository.findByEmail(email).get(0);
+        if(findUser == null)
+            throw new IllegalStateException("존재하지 않는 회원입니다.");
+        String encryptedPassword = userRepository.Encrypt(password);
+        if(findUser.getPassword().equals(encryptedPassword))
+            return findUser;
+        else{
+            System.out.println("encryptedPassword = " + encryptedPassword);
+            throw new IllegalStateException("비밀번호가 일치하지 않습니다.");
+        }
+    }
+
+
+    // Jwt Test - 회원 가입
+    @Transactional
+    public User signup(UserDto2 userDto2) {
+        if (newUserRepository.findOneWithAuthoritiesByName(userDto2.getName()).orElse(null) != null) {
+            throw new RuntimeException("이미 가입되어 있는 유저입니다.");
+        }
+
+        //빌더 패턴의 장점
+        Authority authority = Authority.builder()
+                .authorityName("ROLE_USER")
+                .build();
+
+        User user = User.builder()
+                .name(userDto2.getName())
+                .password(passwordEncoder.encode(userDto2.getPassword()))
+                .email(userDto2.getEmail())
+                .authorities(Collections.singleton(authority))
+                .activated(true)
+                .build();
+
+        return newUserRepository.save(user);
     }
 }

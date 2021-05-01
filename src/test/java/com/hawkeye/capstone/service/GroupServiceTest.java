@@ -42,7 +42,6 @@ public class GroupServiceTest {
         user.setPassword("123");
 
         WaitingList waitingList = new WaitingList();
-        waitingList.setStatus(WaitingStatus.ACCEPT);
 
         Group group = new Group();
         group.setName("gg");
@@ -50,6 +49,7 @@ public class GroupServiceTest {
 
         Queue queue = new Queue();
         queue.setUser(user);
+        queue.setStatus((WaitingStatus.ACCEPT));
         queue.setWaitingList(waitingList);
 
 
@@ -61,5 +61,19 @@ public class GroupServiceTest {
 
         //then
         assertEquals(group, groupService.groupByUser(user.getId()).get(0));
+    }
+
+    @Test
+    public void 입장코드_생성() throws Exception{
+        //given
+        User user = new User();
+        user.setName("professor");
+        user.setPassword("123");
+        user.setEmail("alahoon@naver.com");
+
+        //when
+        userService.join(user, "123");
+        Long group = groupService.createGroup(new Group(), user);
+
     }
 }

@@ -25,7 +25,10 @@ public class UserRepository {
     }
 
     public User findOne(Long id){
-        return em.find(User.class, id);
+        User findUser = em.find(User.class, id);
+        if(findUser == null)
+            throw new IllegalStateException("유효하지 않은 유저입니다.");
+        return findUser;
     }
 
     public List<User> findAll(){
@@ -48,7 +51,7 @@ public class UserRepository {
     /**
      * 비밀번호 해시 변경(SHA256)
      */
-    private String Encrypt(String password){
+    public String Encrypt(String password){
         try{
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[]hash = digest.digest(password.getBytes(StandardCharsets.UTF_8));

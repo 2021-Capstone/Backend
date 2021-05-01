@@ -1,6 +1,7 @@
 package com.hawkeye.capstone.api;
 
 import com.hawkeye.capstone.domain.User;
+import com.hawkeye.capstone.dto.UserDto;
 import com.hawkeye.capstone.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,6 +18,7 @@ public class UserApiController {
     private final UserService userService;
 
     //회원가입
+    /*
     @PostMapping("/api/auth/register")
     public CreateUserResponse saveMember(@RequestBody @Valid CreateUserRequest request){
 
@@ -28,17 +30,58 @@ public class UserApiController {
         Long id = userService.join(user, request.passwordConfirm);
         return new CreateUserResponse(id);
     }
+    */
 
-    // 회원 정보 수정 - 마이페이지  /  ** 일단 email, 이름 수정 ** / 추후에  프로필이미지 추가해야 함
-    @PutMapping("/api/mypage/revise/{id}")
-    public UpdateUserResponse updateMember(@PathVariable("id") Long id,
-                                           @RequestBody @Valid UpdateUserRequest request){
+    //로그인
+    @PostMapping("/api/auth/login")
+    public LogInResponse logIn(@RequestBody @Valid LogInRequest request){
+        return new LogInResponse(userService.loadUserByEmail(request.getEmail(), request.getPassword()).getId());
+    }
 
-        userService.update(id, request.getEmail(), request.getName());
+    //회원 조회
+    @GetMapping("/api/mypage/{userId}")
+    public UserDto userSearch(@PathVariable("userId") Long userId){
 
-        User findUser = userService.findOne(id);
+        User findUser = userService.findOne(userId);
+        //User를 UserDto로 변환
+        UserDto userDto = new UserDto(findUser.getEmail(), findUser.getName());
+        return userDto;
+    }
 
-        return new UpdateUserResponse(findUser.getId(), findUser.getEmail(), findUser.getName());
+    //회원 정보 수정
+    @PatchMapping("/api/mypage/{userId}")
+    public UpdateUserResponse updateUser(@PathVariable("userId") Long userId, @RequestBody @Valid UpdateUserRequest request){
+
+        userService.update(userId, request.getEmail(), request.getName());
+        User findUser = userService.findOne(userId);
+        return new UpdateUserResponse(findUser.getId(), findUser.getEmail());
+    }
+
+    @Data
+    @AllArgsConstructor
+    static class LogInResponse{
+        private Long id;
+    }
+
+    @Data
+    static class LogInRequest{
+        @NotEmpty
+        private String email;
+        @NotEmpty
+        private String password;
+    }
+
+    @Data
+    @AllArgsConstructor
+    static class UpdateUserResponse {
+        private Long id;
+        private String name;
+    }
+
+    @Data
+    static class UpdateUserRequest {
+        private String name;
+        private String email;
     }
 
     @Data
@@ -64,43 +107,5 @@ public class UserApiController {
 
         @NotEmpty
         private String passwordConfirm;
-    }
-
-    @Data
-    static class UpdateUserRequest {  // 정보 수정 시
-
-        @NotEmpty
-        private String email;
-
-        @NotEmpty
-        private String name;
-    }
-
-    @Data
-    @AllArgsConstructor
-    static class UpdateUserResponse {
-        private Long id;
-        private String email;
-        private String name;
-    }
-
-    /**
-     * 회원 정보 조회 - 마이페이지
-     */
-    @GetMapping("api/mypage/{id}")
-    public UserDTO getUserInfo(@PathVariable("id")Long id){
-
-        User findUser = userService.findOne(id);
-
-        return new UserDTO(findUser.getEmail(), findUser.getName(), findUser.getPassword());
-    }
-
-
-    @Data
-    @AllArgsConstructor
-    static class UserDTO{  // user id값 통해서 이메일, 이름, 패스워드(?) 조회
-        private String email;
-        private String name;
-        private String password;
     }
 }

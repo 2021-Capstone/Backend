@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Getter
@@ -21,6 +22,10 @@ public class WaitingList {
 
     private int count;
 
-    @Enumerated(EnumType.STRING)
-    private WaitingStatus status;
+    @OneToMany(mappedBy = "waitingList")
+    private List<Queue> queueList;
+
+    public void countPlus(int plus){
+        count += plus;
+    }
 }

@@ -28,4 +28,15 @@ public class GroupRepository {
         return em.createQuery("select g from Group as g", Group.class)
                 .getResultList();
     }
+
+    public List<Group> findByCode(String code){
+        return em.createQuery("select g from Group g where g.code = :code", Group.class)
+                .setParameter("code", code)
+                .getResultList();
+    }
+
+    public void delete(Group group){
+        System.out.println("===============");
+        em.remove(group);
+    }
 }

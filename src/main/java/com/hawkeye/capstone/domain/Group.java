@@ -29,11 +29,14 @@ public class Group {
     @Column(name = "alert_duration")
     private int alertDuration;
 
+    @Column(name = "class_time")  // 수업 시간
+    private int classTime;
+
     @Column(name = "is_on_air")
     private boolean onAir;
 
     @Column(name = "host_id")  // 해당 그룹의 호스트가 누구인지지
-    private Long host_id;
+    private Long hostId;
 
     @OneToOne(mappedBy = "group")
     private WaitingList waitingList;
