@@ -107,7 +107,6 @@ public class GroupApiController {
             if(queue.getWaitingList().getGroup().getId() == groupId){
                 //status EXIT으로 변경
                 queueRepository.setStatus(queue, WaitingStatus.EXIT);
-                waitingListService.updateCount(queue.getWaitingList(), -1);
             }
         }
         return new ExitGroupResponse(request.getUserId());
