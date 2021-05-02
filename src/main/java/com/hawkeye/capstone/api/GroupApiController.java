@@ -97,7 +97,23 @@ public class GroupApiController {
         return new RejectMemberResponse(groupId);
     }
 
-    //그룹 정보 확인
+    //그룹 탈퇴
+    @PatchMapping("/api/group/exitGroup/{groupId}")
+    public ExitGroupResponse exitGroup(@PathVariable("groupId")Long groupId, @RequestBody ExitGroupRequest request){
+
+        //유저가 속한 Queue 전부 조회
+        List<Queue> queueList = queueRepository.findByUser(request.getUserId());
+        for (Queue queue : queueList) {
+            if(queue.getWaitingList().getGroup().getId() == groupId){
+                //status EXIT으로 변경
+                queueRepository.setStatus(queue, WaitingStatus.EXIT);
+                waitingListService.updateCount(queue.getWaitingList(), -1);
+            }
+        }
+        return new ExitGroupResponse(request.getUserId());
+    }
+
+   //그룹 정보 확인
     @GetMapping("/api/group/getGroupInfo/{groupId}")
     public GroupDto getGroupInfo(@PathVariable("groupId") Long groupId) {
         Group findGroup = groupService.findOne(groupId);
@@ -151,6 +167,16 @@ public class GroupApiController {
 
     }
 
+    @Data
+    @AllArgsConstructor
+    static class ExitGroupResponse{
+        private Long id;
+    }
+
+    @Data
+    static class ExitGroupRequest{
+        private Long userId;
+    }
 
     @Data
     @AllArgsConstructor
