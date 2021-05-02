@@ -5,6 +5,7 @@ import com.hawkeye.capstone.domain.User;
 import com.hawkeye.capstone.dto.UserDto2;
 import com.hawkeye.capstone.repository.NewUserRepository;
 import com.hawkeye.capstone.repository.UserRepository;
+import com.hawkeye.capstone.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -95,7 +97,7 @@ public class UserService {
     // Jwt Test - 회원 가입
     @Transactional
     public User signup(UserDto2 userDto2) {
-        if (newUserRepository.findOneWithAuthoritiesByName(userDto2.getName()).orElse(null) != null) {
+        if (newUserRepository.findOneWithAuthoritiesByEmail(userDto2.getEmail()).orElse(null) != null) {
             throw new RuntimeException("이미 가입되어 있는 유저입니다.");
         }
 
@@ -105,13 +107,19 @@ public class UserService {
                 .build();
 
         User user = User.builder()
-                .name(userDto2.getName())
-                .password(passwordEncoder.encode(userDto2.getPassword()))
                 .email(userDto2.getEmail())
+                .password(passwordEncoder.encode(userDto2.getPassword()))
+                .name(userDto2.getName())
                 .authorities(Collections.singleton(authority))
                 .activated(true)
                 .build();
 
         return newUserRepository.save(user);
+    }
+
+    // Jwt Test- 현재 로그인한 회원이 자신의 정보 가져오기
+    @Transactional(readOnly = true)
+    public Optional<User> getMyUserWithAuthorities() {
+        return SecurityUtil.getCurrentUsername().flatMap(newUserRepository::findOneWithAuthoritiesByEmail);
     }
 }

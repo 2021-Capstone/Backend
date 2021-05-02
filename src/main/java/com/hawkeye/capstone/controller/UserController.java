@@ -5,9 +5,15 @@ import com.hawkeye.capstone.dto.UserDto;
 import com.hawkeye.capstone.dto.UserDto2;
 import com.hawkeye.capstone.service.UserService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+
+// AuthController에 있는  authenticate/ api 통해서 로그인 성공하면  토큰 발급받는다
+// 로그인 상태에서 다른 요청 보낼 시 Post man에서 Authorization 클릭 후  Type은 Bearer Token을 선택하고
+// 발급받은 토큰 값을 입력해주고 요청을 보내면 된다
+
 
 @RestController
 @RequestMapping("/api")
@@ -29,6 +35,12 @@ public class UserController {
             @Valid @RequestBody UserDto2 userDto2
     ) {
         return ResponseEntity.ok(userService.signup(userDto2));
+    }
+
+    @GetMapping("/user")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    public ResponseEntity<User> getMyUserInfo() {
+        return ResponseEntity.ok(userService.getMyUserWithAuthorities().get());
     }
 
 }
