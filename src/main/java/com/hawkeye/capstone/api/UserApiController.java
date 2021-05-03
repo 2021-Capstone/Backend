@@ -17,6 +17,8 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.sql.Blob;
 import java.time.LocalDateTime;
 
 @RestController
@@ -33,6 +35,8 @@ public class UserApiController {
         user.setEmail(request.email);
         user.setName(request.name);
         user.setPassword(request.password);
+        user.setImage(request.image.getBytes(StandardCharsets.UTF_8));
+        System.out.println("request = " + request.image.getBytes(StandardCharsets.UTF_8));
 
         Long id = userService.join(user, request.passwordConfirm);
         return new CreateUserResponse(id);
@@ -50,7 +54,7 @@ public class UserApiController {
 
         User findUser = userService.findOne(userId);
         //User를 UserDto로 변환
-        UserDto userDto = new UserDto(findUser.getEmail(), findUser.getName());
+        UserDto userDto = new UserDto(findUser.getEmail(), findUser.getName(), findUser.getImage());
         return userDto;
     }
 
@@ -58,7 +62,7 @@ public class UserApiController {
     @PatchMapping("/api/mypage/{userId}")
     public UpdateUserResponse updateUser(@PathVariable("userId") Long userId, @RequestBody @Valid UpdateUserRequest request){
 
-        userService.update(userId, request.getEmail(), request.getName());
+        userService.update(userId, request.getEmail(), request.getName(), request.getImage());
         User findUser = userService.findOne(userId);
         return new UpdateUserResponse(findUser.getId(), findUser.getEmail());
     }
@@ -118,6 +122,7 @@ public class UserApiController {
     static class UpdateUserRequest {
         private String name;
         private String email;
+        private String image;
     }
 
     @Data
@@ -143,5 +148,7 @@ public class UserApiController {
 
         @NotEmpty
         private String passwordConfirm;
+
+        private String image;
     }
 }

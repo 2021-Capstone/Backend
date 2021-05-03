@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.StandardCharsets;
+import java.sql.Blob;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -52,10 +54,11 @@ public class UserService {
      * 회원 정보 수정
      */
     @Transactional //회원 정보 폼에서 데이터 가져와서 수정(변경 감지)
-    public void update(Long id, String email, String name){
+    public void update(Long id, String email, String name, String image){
         User user = userRepository.findOne(id);
         user.setEmail(email);
         user.setName(name);
+        user.setImage(image.getBytes(StandardCharsets.UTF_8));
     }
 
     /**
