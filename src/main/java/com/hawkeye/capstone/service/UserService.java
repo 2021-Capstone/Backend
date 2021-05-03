@@ -122,4 +122,13 @@ public class UserService {
     public Optional<User> getMyUserWithAuthorities() {
         return SecurityUtil.getCurrentUsername().flatMap(newUserRepository::findOneWithAuthoritiesByEmail);
     }
+
+    @Transactional
+    public User updateInfo(User user, String email, String password, String name){
+        user.setEmail(email);
+        user.setPassword(password);
+        user.setName(name);
+
+        return user;
+    }
 }

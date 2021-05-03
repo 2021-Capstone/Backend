@@ -37,10 +37,21 @@ public class UserController {
         return ResponseEntity.ok(userService.signup(userDto2));
     }
 
+    // 현재 로그인한 유저 정보 조회
     @GetMapping("/user")
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<User> getMyUserInfo() {
         return ResponseEntity.ok(userService.getMyUserWithAuthorities().get());
     }
+
+    // 현재 로그인한 유저 정보 수정 test
+    @PatchMapping("/mypage2")
+    public ResponseEntity<User> updateUserInfo(@Valid @RequestBody UserDto2 userDto2){
+        User user = userService.getMyUserWithAuthorities().get();
+
+        return ResponseEntity.ok(userService.updateInfo(user, userDto2.getEmail(),
+                userDto2.getPassword(), userDto2.getName()));
+    }
+
 
 }
