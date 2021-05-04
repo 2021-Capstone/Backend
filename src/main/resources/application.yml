@@ -23,3 +23,7 @@ spring:
 logging.level:
   org.hibernate.SQL: debug
 # org.hibernate.type: trace
+
+app:
+  upload:
+    dir: D:\Capstone\Image\

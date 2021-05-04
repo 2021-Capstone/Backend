@@ -25,10 +25,13 @@ public class User {
     private String password;
 
     //이미지 저장 byte[]로 매핑하면 DB에서는 BLOB 저장(?)
-    @Column(name = "profile_image", length = 100000)
-    private byte[] image;
+//    @Column(name = "profile_image", length = 100000)
+//    private byte[] image;
 
     @Column(name = "user_name")
     private String name;
+
+    @Column(name = "image_directory")
+    private String imageDir;
 
 }

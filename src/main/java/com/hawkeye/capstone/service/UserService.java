@@ -54,11 +54,12 @@ public class UserService {
      * 회원 정보 수정
      */
     @Transactional //회원 정보 폼에서 데이터 가져와서 수정(변경 감지)
-    public void update(Long id, String email, String name, String image){
+    public void update(Long id, String email, String name, String imageDir){
         User user = userRepository.findOne(id);
         user.setEmail(email);
         user.setName(name);
-        user.setImage(image.getBytes(StandardCharsets.UTF_8));
+        //user.setImage(image.getBytes(StandardCharsets.UTF_8));
+        user.setImageDir(imageDir);
     }
 
     /**
@@ -71,6 +72,15 @@ public class UserService {
     public User findByEmail(String email){
         return userRepository.findByEmail(email).get(0);
     }
+
+    /**
+     * 이미지 경로 저장
+     */
+    @Transactional
+    public void setImageDir(User user, String directory){
+        user.setImageDir(directory);
+    }
+
     /**
      * 로그인
      */

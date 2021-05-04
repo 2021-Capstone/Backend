@@ -2,43 +2,51 @@ package com.hawkeye.capstone.api;
 
 import com.hawkeye.capstone.domain.User;
 import com.hawkeye.capstone.dto.UserDto;
-import com.hawkeye.capstone.service.GroupService;
+import com.hawkeye.capstone.service.FileService;
 import com.hawkeye.capstone.service.UserService;
-import com.hawkeye.capstone.service.WaitingListService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import javax.persistence.EntityManager;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.sql.Blob;
-import java.time.LocalDateTime;
 
 @RestController
 @RequiredArgsConstructor
 public class UserApiController {
 
     private final UserService userService;
+    private final FileService fileService;
+
+    //회원가입
+//    @PostMapping("/api/auth/register")
+//    public CreateUserResponse saveMember(@RequestBody @Valid CreateUserRequest request, @RequestParam("file") MultipartFile file){
+//
+//        User user = new User();
+//        user.setEmail(request.email);
+//        user.setName(request.name);
+//        user.setPassword(request.password);
+//        user.setImageDir(fileService.fileUpload(file));
+//        //user.setImage(request.image.getBytes(StandardCharsets.UTF_8));
+//        //System.out.println("request = " + request.image.getBytes(StandardCharsets.UTF_8));
+//
+//        Long id = userService.join(user, request.passwordConfirm);
+//        return new CreateUserResponse(id);
+//    }
 
     //회원가입
     @PostMapping("/api/auth/register")
-    public CreateUserResponse saveMember(@RequestBody @Valid CreateUserRequest request){
+    public CreateUserResponse saveMember(@RequestParam("email") String email, @RequestParam("name")String name,
+            @RequestParam("password") String password, @RequestParam("passwordConfirm") String passwordConfirm, @RequestParam("file") MultipartFile file){
 
         User user = new User();
-        user.setEmail(request.email);
-        user.setName(request.name);
-        user.setPassword(request.password);
-        user.setImage(request.image.getBytes(StandardCharsets.UTF_8));
-        System.out.println("request = " + request.image.getBytes(StandardCharsets.UTF_8));
+        user.setEmail(email);
+        user.setName(name);
+        user.setPassword(password);
+        user.setImageDir(fileService.fileUpload(file));
 
-        Long id = userService.join(user, request.passwordConfirm);
+        Long id = userService.join(user, passwordConfirm);
         return new CreateUserResponse(id);
     }
 
@@ -54,7 +62,7 @@ public class UserApiController {
 
         User findUser = userService.findOne(userId);
         //User를 UserDto로 변환
-        UserDto userDto = new UserDto(findUser.getEmail(), findUser.getName(), findUser.getImage());
+        UserDto userDto = new UserDto(findUser.getEmail(), findUser.getName(), findUser.getImageDir());
         return userDto;
     }
 
@@ -62,40 +70,27 @@ public class UserApiController {
     @PatchMapping("/api/mypage/{userId}")
     public UpdateUserResponse updateUser(@PathVariable("userId") Long userId, @RequestBody @Valid UpdateUserRequest request){
 
-        userService.update(userId, request.getEmail(), request.getName(), request.getImage());
+        userService.update(userId, request.getEmail(), request.getName(), request.getImageDir());
         User findUser = userService.findOne(userId);
         return new UpdateUserResponse(findUser.getId(), findUser.getEmail());
     }
 
     //이미지 저장
 //    @PostMapping("/api/image/upload/{userId}")
-//    public Long imageUpload(@PathVariable("userId")Long userId, @RequestParam MultipartFile file) throws IOException{
+//    public Long imageUpload(@PathVariable("userId")Long userId, @RequestParam("file") MultipartFile file){
+//        String directory = fileService.fileUpload(file);
+//        tempDir = directory;
+//        userService.setImageDir(userId, directory);
 //
-//        LocalDateTime localDateTime = LocalDateTime.now();
-//        StringBuilder sb = new StringBuilder();
-//
-//        if(file.isEmpty()){
-//            sb.append("none");
-//        }
-//        else{
-//            sb.append(localDateTime);
-//            sb.append(file.getOriginalFilename());
-//        }
-//
-//        if(!file.isEmpty()){
-//            //로컬에 저장
-//            File dest = new File("D:\\Capstone\\Image" + sb.toString());
-//            try{
-//                file.transferTo(dest);
-//            } catch (IllegalStateException e){
-//                e.printStackTrace();
-//            } catch (IOException e){
-//                e.printStackTrace();
-//            }
-//            //DB에 저장
-//        }
+//        return userId;
 //    }
 
+    //이미지 경로 불러오기
+    @GetMapping("/api/image/getImage/{userId}")
+    public String getImage(@PathVariable("userId")Long userId){
+        User findUser = userService.findOne(userId);
+        return findUser.getImageDir();
+    }
 
     @Data
     @AllArgsConstructor
@@ -122,7 +117,7 @@ public class UserApiController {
     static class UpdateUserRequest {
         private String name;
         private String email;
-        private String image;
+        private String imageDir;
     }
 
     @Data
@@ -149,6 +144,5 @@ public class UserApiController {
         @NotEmpty
         private String passwordConfirm;
 
-        private String image;
     }
 }

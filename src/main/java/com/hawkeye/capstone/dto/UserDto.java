@@ -8,12 +8,13 @@ public class UserDto {
 
     private String email;
     private String name;
-    private byte[] image;
+    //private byte[] image;
+    private String imageDir;
 
-    public UserDto(String email, String name, byte[] image) {
+    public UserDto(String email, String name, String imageDir) {
         this.email = email;
         this.name = name;
-        this.image = image;
+        this.imageDir = imageDir;
     }
 
     public UserDto(String email, String name) {
