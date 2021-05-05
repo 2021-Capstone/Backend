@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 
@@ -37,8 +38,8 @@ public class UserApiController {
 
     //회원가입
     @PostMapping("/api/auth/register")
-    public CreateUserResponse saveMember(@RequestParam("email") String email, @RequestParam("name")String name,
-            @RequestParam("password") String password, @RequestParam("passwordConfirm") String passwordConfirm, @RequestParam("file") MultipartFile file){
+    public CreateUserResponse registerMember(@RequestParam("email") String email, @RequestParam("name") String name,
+                                             @RequestParam("password") String password, @RequestParam("passwordConfirm") String passwordConfirm, @RequestParam("file") MultipartFile file) {
 
         User user = new User();
         user.setEmail(email);
@@ -52,13 +53,13 @@ public class UserApiController {
 
     //로그인
     @PostMapping("/api/auth/login")
-    public LogInResponse logIn(@RequestBody @Valid LogInRequest request){
+    public LogInResponse logIn(@RequestBody @Valid LogInRequest request) {
         return new LogInResponse(userService.loadUserByEmail(request.getEmail(), request.getPassword()).getId());
     }
 
     //회원 조회
     @GetMapping("/api/mypage/{userId}")
-    public UserDto userSearch(@PathVariable("userId") Long userId){
+    public UserDto userSearch(@PathVariable("userId") Long userId) {
 
         User findUser = userService.findOne(userId);
         //User를 UserDto로 변환
@@ -68,12 +69,22 @@ public class UserApiController {
 
     //회원 정보 수정
     @PatchMapping("/api/mypage/{userId}")
-    public UpdateUserResponse updateUser(@PathVariable("userId") Long userId, @RequestBody @Valid UpdateUserRequest request){
+    public UpdateUserResponse updateUser(@PathVariable("userId") Long userId, @RequestParam("email") String email,
+                                         @RequestParam("name") String name, @RequestParam("file") MultipartFile file) {
 
-        userService.update(userId, request.getEmail(), request.getName(), request.getImageDir());
+        userService.update(userId, email, name, fileService.fileUpload(file));
         User findUser = userService.findOne(userId);
         return new UpdateUserResponse(findUser.getId(), findUser.getEmail());
     }
+
+    //회원 정보 수정
+//    @PatchMapping("/api/mypage/{userId}")
+//    public UpdateUserResponse updateUser(@PathVariable("userId") Long userId, @RequestBody @Valid UpdateUserRequest request){
+//
+//        userService.update(userId, request.getEmail(), request.getName(), request.getImageDir());
+//        User findUser = userService.findOne(userId);
+//        return new UpdateUserResponse(findUser.getId(), findUser.getEmail());
+//    }
 
     //이미지 저장
 //    @PostMapping("/api/image/upload/{userId}")
@@ -87,19 +98,19 @@ public class UserApiController {
 
     //이미지 경로 불러오기
     @GetMapping("/api/image/getImage/{userId}")
-    public String getImage(@PathVariable("userId")Long userId){
+    public String getImage(@PathVariable("userId") Long userId) {
         User findUser = userService.findOne(userId);
         return findUser.getImageDir();
     }
 
     @Data
     @AllArgsConstructor
-    static class LogInResponse{
+    static class LogInResponse {
         private Long id;
     }
 
     @Data
-    static class LogInRequest{
+    static class LogInRequest {
         @NotEmpty
         private String email;
         @NotEmpty
