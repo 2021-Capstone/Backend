@@ -123,10 +123,11 @@ public class UserService {
         return SecurityUtil.getCurrentUsername().flatMap(newUserRepository::findOneWithAuthoritiesByEmail);
     }
 
+    // Jwt Test- 현재 로그인한 회원이 자신의 정보 수정하기
     @Transactional
     public User updateInfo(User user, String email, String password, String name){
         user.setEmail(email);
-        user.setPassword(password);
+        user.setPassword(passwordEncoder.encode(password)); // encode = 비밀번호를 단방향 암호화
         user.setName(name);
 
         return user;
