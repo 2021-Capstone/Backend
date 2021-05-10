@@ -25,7 +25,6 @@ public class SessionService {
         Session session = new Session();
         session.setStartTime(LocalDateTime.now());
         session.setGroup(group);
-        group.getSessionList().add(session); //어차피 한 그룹에서 수업은 하나만 할 수 있긴 함
         group.setOnAir(true);
         sessionRepository.save(session);
 

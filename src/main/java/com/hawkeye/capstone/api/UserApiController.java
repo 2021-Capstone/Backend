@@ -39,7 +39,8 @@ public class UserApiController {
     //회원가입
     @PostMapping("/api/auth/register")
     public CreateUserResponse registerMember(@RequestParam("email") String email, @RequestParam("name") String name,
-                                             @RequestParam("password") String password, @RequestParam("passwordConfirm") String passwordConfirm, @RequestParam("file") MultipartFile file) {
+                                             @RequestParam("password") String password, @RequestParam("passwordConfirm") String passwordConfirm,
+                                             @RequestParam("file") MultipartFile file) {
 
         User user = new User();
         user.setEmail(email);

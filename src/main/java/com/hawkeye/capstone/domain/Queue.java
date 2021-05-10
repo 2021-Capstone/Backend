@@ -26,4 +26,12 @@ public class Queue {
     @Enumerated(EnumType.STRING)
     private WaitingStatus status;
 
+    /**
+     * 연관관계 편의 메소드
+     */
+    public void setWaitingList(WaitingList waitingList){
+        this.setWaitingList(waitingList);
+        waitingList.getQueueList().add(this);
+    }
+
 }

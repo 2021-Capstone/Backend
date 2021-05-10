@@ -25,4 +25,9 @@ public class Session {
 
     @Column(name = "session_end_time")
     private LocalDateTime endTime;
+
+    public void setGroup(Group group){
+        this.setGroup(group);
+        group.getSessionList().add(this); //어차피 한 그룹에서 수업은 하나만 할 수 있긴 함
+    }
 }

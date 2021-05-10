@@ -22,6 +22,7 @@ public class GroupService {
     private final QueueRepository queueRepository;
     private final UserService userService;
     private final WaitingListService waitingListService;
+    private final QueueService queueService;
 
     //그룹 생성
     @Transactional
@@ -107,8 +108,7 @@ public class GroupService {
         else{
             Group findGroup = groupRepository.findByCode(groupEnterCode).get(0);
             Queue queue = new Queue();
-            queueRepository.init(queue, user, findGroup.getWaitingList());
-            queueRepository.save(queue);
+            queueService.init(queue, user, findGroup.getWaitingList());
 
             return findGroup.getId();
         }

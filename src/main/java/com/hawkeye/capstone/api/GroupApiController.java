@@ -140,7 +140,6 @@ public class GroupApiController {
             //status가 ACCEPT인 큐만 골라내기
             if(queue.getStatus() == WaitingStatus.ACCEPT)
             {
-                System.out.println("queue.getStatus() = " + queue.getStatus());
                 findQueueList.add(queue);
             }
         }

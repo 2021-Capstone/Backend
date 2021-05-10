@@ -19,14 +19,6 @@ public class QueueRepository {
     private final UserRepository userRepository;
     private final GroupRepository groupRepository;
 
-    public void init(Queue queue, User user, WaitingList waitingList){
-        waitingList.countPlus(1);
-        queue.setUser(user);
-        queue.setWaitingList(waitingList);
-        queue.getWaitingList().getQueueList().add(queue);
-        queue.setStatus(WaitingStatus.WAIT);
-    }
-
     public void save(Queue queue){
         em.persist(queue);
     }

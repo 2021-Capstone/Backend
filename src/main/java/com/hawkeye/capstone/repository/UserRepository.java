@@ -53,11 +53,16 @@ public class UserRepository {
      */
     public String Encrypt(String password){
         try{
+            //MessageDigest: 해시 알고리즘 사용 라이브러리
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            //password 문자열을 SHA-256로 암호화하여 byte배열에 저장
             byte[]hash = digest.digest(password.getBytes(StandardCharsets.UTF_8));
+            //StringBuffer: append 메소드로 문자 추가(mutable)
             StringBuffer hexString = new StringBuffer();
 
+            //byte를 String으로 변환
             for(int i = 0; i < hash.length; i++){
+                //16진수 전환
                 String hex = Integer.toHexString(0xff & hash[i]);
                 if(hex.length() == 1)
                     hexString.append('0');
