@@ -1,6 +1,7 @@
 package com.hawkeye.capstone.controller;
 
 import com.hawkeye.capstone.domain.User;
+import com.hawkeye.capstone.dto.UpdateUserInfoDto;
 import com.hawkeye.capstone.dto.UserDto;
 import com.hawkeye.capstone.dto.UserDto2;
 import com.hawkeye.capstone.service.UserService;
@@ -46,11 +47,10 @@ public class UserController {
 
     // 현재 로그인한 유저 정보 수정 test
     @PatchMapping("/mypage2")
-    public ResponseEntity<User> updateUserInfo(@Valid @RequestBody UserDto2 userDto2){
+    public ResponseEntity<User> updateUserInfo(@Valid @RequestBody UpdateUserInfoDto updateUserInfoDto){
         User user = userService.getMyUserWithAuthorities().get();
 
-        return ResponseEntity.ok(userService.updateInfo(user, userDto2.getEmail(),
-                userDto2.getPassword(), userDto2.getName()));
+        return ResponseEntity.ok(userService.updateInfo(user, updateUserInfoDto.getEmail(), updateUserInfoDto.getName()));
     }
 
 

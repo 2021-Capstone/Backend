@@ -15,6 +15,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import java.nio.charset.StandardCharsets;
+import java.sql.Blob;
+
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -61,10 +64,12 @@ public class UserService {
      * 회원 정보 수정
      */
     @Transactional //회원 정보 폼에서 데이터 가져와서 수정(변경 감지)
-    public void update(Long id, String email, String name){
+    public void update(Long id, String email, String name, String imageDir){
         User user = userRepository.findOne(id);
         user.setEmail(email);
         user.setName(name);
+        //user.setImage(image.getBytes(StandardCharsets.UTF_8));
+        user.setImageDir(imageDir);
     }
 
     /**
@@ -77,6 +82,16 @@ public class UserService {
     public User findByEmail(String email){
         return userRepository.findByEmail(email).get(0);
     }
+
+    /**
+     * 이미지 경로 저장
+     */
+    @Transactional
+    public void setImageDir(User user, String directory){
+        user.setImageDir(directory);
+    }
+
+
     /**
      * 로그인
      */
@@ -125,9 +140,9 @@ public class UserService {
 
     // Jwt Test- 현재 로그인한 회원이 자신의 정보 수정하기
     @Transactional
-    public User updateInfo(User user, String email, String password, String name){
+    public User updateInfo(User user, String email, String name){
         user.setEmail(email);
-        user.setPassword(passwordEncoder.encode(password)); // encode = 비밀번호를 단방향 암호화
+        //user.setPassword(passwordEncoder.encode(password)); // encode = 비밀번호를 단방향 암호화
         user.setName(name);
 
         return user;

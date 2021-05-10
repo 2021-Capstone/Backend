@@ -4,9 +4,21 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
-@AllArgsConstructor
 public class UserDto {
 
     private String email;
-    private String username;
+    private String name;
+    //private byte[] image;
+    private String imageDir;
+
+    public UserDto(String email, String name, String imageDir) {
+        this.email = email;
+        this.name = name;
+        this.imageDir = imageDir;
+    }
+
+    public UserDto(String email, String name) {
+        this.email = email;
+        this.name = name;
+    }
 }

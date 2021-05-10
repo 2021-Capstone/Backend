@@ -1,12 +1,10 @@
 package com.hawkeye.capstone.api;
 
-import com.hawkeye.capstone.domain.Group;
-import com.hawkeye.capstone.domain.Queue;
-import com.hawkeye.capstone.domain.User;
-import com.hawkeye.capstone.domain.WaitingStatus;
+import com.hawkeye.capstone.domain.*;
 import com.hawkeye.capstone.dto.UserDto;
 import com.hawkeye.capstone.repository.QueueRepository;
 import com.hawkeye.capstone.service.GroupService;
+import com.hawkeye.capstone.service.SessionService;
 import com.hawkeye.capstone.service.UserService;
 import com.hawkeye.capstone.service.WaitingListService;
 import lombok.AllArgsConstructor;
@@ -27,6 +25,7 @@ public class GroupApiController {
     private final UserService userService;
     private final QueueRepository queueRepository;
     private final WaitingListService waitingListService;
+    private final SessionService sessionService;
 
     //그룹 생성
     @PostMapping("/api/group/createGroup")
@@ -46,6 +45,28 @@ public class GroupApiController {
 
         Long id = groupService.createGroup(group, userService.findOne(request.getUserId()));
         return new CreateGroupResponse(id, group.getCode());
+    }
+
+    @PostMapping("/api/group/startSession/{groupId}")
+    public SessionDto startSession(@PathVariable("groupId")Long groupId){
+        Group findGroup = groupService.findOne(groupId);
+        Long sessionId = sessionService.createSession(findGroup);
+
+        return new SessionDto(sessionId);
+    }
+
+    @PatchMapping("/api/group/endSession/{sessionId}")
+    public SessionDto endSession(@PathVariable("sessionId")Long sessionId){
+        Session findSession = sessionService.findOne(sessionId);
+
+        return new SessionDto(sessionService.endSession(findSession));
+
+    }
+
+    @Data
+    @AllArgsConstructor
+    static class SessionDto {
+        private Long id;
     }
 
     //그룹 삭제
@@ -96,6 +117,33 @@ public class GroupApiController {
         }
 
         return new RejectMemberResponse(groupId);
+    }
+
+    //그룹 탈퇴
+    @PatchMapping("/api/group/exitGroup/{groupId}")
+    public ExitGroupResponse exitGroup(@PathVariable("groupId")Long groupId, @RequestBody ExitGroupRequest request){
+
+        //유저가 속한 Queue 전부 조회
+        List<Queue> queueList = queueRepository.findByUser(request.getUserId());
+        for (Queue queue : queueList) {
+            if(queue.getWaitingList().getGroup().getId() == groupId){
+                //status EXIT으로 변경
+                queueRepository.setStatus(queue, WaitingStatus.EXIT);
+               // waitingListService.updateCount(queue.getWaitingList(), -1);
+            }
+        }
+        return new ExitGroupResponse(request.getUserId());
+    }
+
+    @Data
+    @AllArgsConstructor
+    static class ExitGroupResponse{
+        private Long id;
+    }
+
+    @Data
+    static class ExitGroupRequest{
+        private Long userId;
     }
 
     //그룹 정보 확인
