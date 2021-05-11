@@ -1,12 +1,23 @@
 package com.hawkeye.capstone.api;
 
 import com.hawkeye.capstone.domain.User;
+import com.hawkeye.capstone.dto.TokenDto;
 import com.hawkeye.capstone.dto.UserDto;
+import com.hawkeye.capstone.jwt.JwtFilter;
+import com.hawkeye.capstone.jwt.TokenProvider;
 import com.hawkeye.capstone.service.FileService;
 import com.hawkeye.capstone.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,6 +30,8 @@ public class UserApiController {
 
     private final UserService userService;
     private final FileService fileService;
+    private final TokenProvider tokenProvider;
+    private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
     //회원가입
 //    @PostMapping("/api/auth/register")
@@ -52,10 +65,32 @@ public class UserApiController {
         return new CreateUserResponse(id);
     }
 
+
     //로그인
+//    @PostMapping("/api/auth/login")
+//    public LogInResponse logIn(@RequestBody @Valid LogInRequest request) {
+//        return new LogInResponse(userService.loadUserByEmail(request.getEmail(), request.getPassword()).getId());
+//    }
+//
+    //로그인 토큰
     @PostMapping("/api/auth/login")
-    public LogInResponse logIn(@RequestBody @Valid LogInRequest request) {
-        return new LogInResponse(userService.loadUserByEmail(request.getEmail(), request.getPassword()).getId());
+    public ResponseEntity<TokenDto> logIn(@RequestBody @Valid LogInRequest request) {
+//        User user = userService.loadUserByEmail(request.getEmail(), request.getPassword());
+
+        User findUser = userService.findByEmail(request.getEmail());
+
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword());
+
+        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        String jwt = tokenProvider.createToken(authentication);
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer" + jwt);
+
+        return new ResponseEntity<>(new TokenDto(jwt), httpHeaders, HttpStatus.OK);
     }
 
     //회원 조회

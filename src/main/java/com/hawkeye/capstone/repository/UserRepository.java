@@ -48,6 +48,16 @@ public class UserRepository {
                 .getResultList();
     }
 
+    //이메일로 authority 정보 포함 User 정보 가져오기
+    public User findWithAuthoritiesByEmail(String email){
+        return em.createQuery("select u from User u " +
+                "join u.authorities " +
+                "where u.email = :email", User.class)
+                .setParameter("email", email)
+                .getResultList()
+                .get(0);
+    }
+
     /**
      * 비밀번호 해시 변경(SHA256)
      */

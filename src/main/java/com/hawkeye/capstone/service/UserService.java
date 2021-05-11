@@ -85,7 +85,8 @@ public class UserService {
      * 로그인
      */
     public User loadUserByEmail(String email, String password){
-        User findUser = userRepository.findByEmail(email).get(0);
+        User findUser = userRepository.findWithAuthoritiesByEmail(email);
+//        User findUser = userRepository.findByEmail(email).get(0);
         if(findUser == null)
             throw new IllegalStateException("존재하지 않는 회원입니다.");
         String encryptedPassword = userRepository.Encrypt(password);
