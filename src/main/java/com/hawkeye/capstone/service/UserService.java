@@ -26,16 +26,11 @@ public class UserService {
         validateDuplicateUser(userDto.getEmail());
         validatePassword(userDto.getPassword(), passwordConfirm);
 
-        Authority authority = Authority.builder()
-                .authorityName("ROLE_USER")
-                .build();
-
         User user = User.builder()
                 .email(userDto.getEmail())
                 .name(userDto.getName())
                 .password(userDto.getPassword())
                 .imageDir(userDto.getImageDir())
-                .authorities(Collections.singleton(authority))
                 .build();
 
 
