@@ -3,8 +3,6 @@ package com.hawkeye.capstone.api;
 import com.hawkeye.capstone.domain.User;
 import com.hawkeye.capstone.dto.TokenDto;
 import com.hawkeye.capstone.dto.UserDto;
-import com.hawkeye.capstone.jwt.JwtFilter;
-import com.hawkeye.capstone.jwt.TokenProvider;
 import com.hawkeye.capstone.service.FileService;
 import com.hawkeye.capstone.service.UserService;
 import lombok.AllArgsConstructor;
@@ -13,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -30,7 +27,6 @@ public class UserApiController {
 
     private final UserService userService;
     private final FileService fileService;
-    private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
     //회원가입
@@ -55,13 +51,17 @@ public class UserApiController {
                                              @RequestParam("password") String password, @RequestParam("passwordConfirm") String passwordConfirm,
                                              @RequestParam("file") MultipartFile file) {
 
-        User user = new User();
-        user.setEmail(email);
-        user.setName(name);
-        user.setPassword(password);
-        user.setImageDir(fileService.fileUpload(file));
+        UserDto userDto = new UserDto(email, name, fileService.fileUpload(file), password);
 
-        Long id = userService.join(user, passwordConfirm);
+//        User user = new User();
+//        user.setEmail(email);
+//        user.setName(name);
+//        user.setPassword(password);
+//        user.setImageDir(fileService.fileUpload(file));
+
+
+
+        Long id = userService.join(userDto, passwordConfirm);
         return new CreateUserResponse(id);
     }
 

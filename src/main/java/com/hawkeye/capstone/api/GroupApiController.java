@@ -37,11 +37,8 @@ public class GroupApiController {
         group.setAlertDuration(request.getAlertDuration());
 
         //임시 호스트 생성
-        User user = new User();
-        user.setName("김지훈");
-        user.setEmail("alahoon@naver.com");
-        user.setPassword("123");
-        userService.join(user, "123");
+        UserDto userDto = new UserDto("alahoon@naver.com", "김지훈", "123");
+        userService.join(userDto, "123");
 
         Long id = groupService.createGroup(group, userService.findOne(request.getUserId()));
         return new CreateGroupResponse(id, group.getCode());
