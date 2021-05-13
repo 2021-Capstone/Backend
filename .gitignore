@@ -37,4 +37,4 @@ out/
 .vscode/
 
 ### resources ###
-.yml
+*.yml
