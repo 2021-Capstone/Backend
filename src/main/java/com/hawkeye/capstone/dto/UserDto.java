@@ -8,7 +8,6 @@ public class UserDto {
 
     private String email;
     private String name;
-    //private byte[] image;
     private String imageDir;
     private String password;
 
@@ -19,10 +18,10 @@ public class UserDto {
         this.password = password;
     }
 
-    public UserDto(String email, String name, String password) {
+    public UserDto(String email, String name, String imageDir) {
         this.email = email;
         this.name = name;
-        this.password = password;
+        this.password = imageDir;
     }
 
     public UserDto(String email, String name) {

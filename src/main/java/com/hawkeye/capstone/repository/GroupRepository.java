@@ -1,6 +1,7 @@
 package com.hawkeye.capstone.repository;
 
 import com.hawkeye.capstone.domain.Group;
+import com.hawkeye.capstone.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -30,6 +31,12 @@ public class GroupRepository {
     public List<Group> findByCode(String code){
         return em.createQuery("select g from Group g where g.code = :code", Group.class)
                 .setParameter("code", code)
+                .getResultList();
+    }
+
+    public List<Group> findByHost(Long hostId){
+        return em.createQuery("select g from Group g where g.hostId = :hostId", Group.class)
+                .setParameter("hostId", hostId)
                 .getResultList();
     }
 

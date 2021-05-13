@@ -1,13 +1,16 @@
 package com.hawkeye.capstone.domain;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
 
 @Entity
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Queue {
 
     @Id
@@ -30,7 +33,7 @@ public class Queue {
      * 연관관계 편의 메소드
      */
     public void setWaitingList(WaitingList waitingList){
-        this.setWaitingList(waitingList);
+        this.waitingList = waitingList;
         waitingList.getQueueList().add(this);
     }
 

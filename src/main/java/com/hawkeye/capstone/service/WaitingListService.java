@@ -1,6 +1,7 @@
 package com.hawkeye.capstone.service;
 
 import com.hawkeye.capstone.domain.Group;
+import com.hawkeye.capstone.domain.Queue;
 import com.hawkeye.capstone.domain.WaitingList;
 import com.hawkeye.capstone.repository.WaitingListRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,8 @@ public class WaitingListService {
     }
 
     @Transactional
-    public void updateCount(WaitingList waitingList, int value){
+    public void updateCount(Queue queue, int value){
+        WaitingList waitingList = waitingListRepository.findByQueue(queue);
         waitingList.countPlus(value);
     }
 }

@@ -31,6 +31,7 @@ public class UserService {
                 .name(userDto.getName())
                 .password(userDto.getPassword())
                 .imageDir(userDto.getImageDir())
+                .roles(Collections.singletonList("ROLE_USER"))
                 .build();
 
 
@@ -89,15 +90,14 @@ public class UserService {
     /**
      * 로그인
      */
-    public User loadUserByEmail(String email, String password) {
+    public Boolean loadUserByEmail(String email, String password) {
         User findUser = userRepository.findByEmail(email).get(0);
         if (findUser == null)
             throw new IllegalStateException("존재하지 않는 회원입니다.");
         String encryptedPassword = userRepository.Encrypt(password);
         if (findUser.getPassword().equals(encryptedPassword))
-            return findUser;
+            return true;
         else {
-            System.out.println("encryptedPassword = " + encryptedPassword);
             throw new IllegalStateException("비밀번호가 일치하지 않습니다.");
         }
     }
