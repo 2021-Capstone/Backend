@@ -74,7 +74,7 @@ public class GroupService {
     public List<Group> groupByUser(Long userId) {
         List<Queue> queueByUserList = queueRepository.findByUser(userId);
 
-        List<Group> groupList = new ArrayList<>();
+        List<Group> groupList = groupRepository.findByHost(userId);
 
         for (Queue queue : queueByUserList) {
             if (queue.getStatus() == WaitingStatus.ACCEPT)
@@ -107,8 +107,7 @@ public class GroupService {
         }
         else{
             Group findGroup = groupRepository.findByCode(groupEnterCode).get(0);
-            Queue queue = new Queue();
-            queueService.init(queue, user, findGroup.getWaitingList());
+            queueService.init(user, findGroup.getWaitingList());
 
             return findGroup.getId();
         }

@@ -1,8 +1,7 @@
 package com.hawkeye.capstone.api;
 
-import com.hawkeye.capstone.domain.Queue;
-import com.hawkeye.capstone.domain.WaitingList;
-import com.hawkeye.capstone.domain.WaitingStatus;
+import com.hawkeye.capstone.domain.*;
+import com.hawkeye.capstone.dto.GroupSearchDto;
 import com.hawkeye.capstone.service.GroupService;
 import com.hawkeye.capstone.service.UserService;
 import com.hawkeye.capstone.service.WaitingListService;
@@ -14,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,12 +25,31 @@ public class MainPageApiController {
     private final UserService userService;
     private final WaitingListService waitingListService;
 
-    //host 입장에서 WaitingList 목록 가져오기(status가 wait인 것들만)
+    //host 입장에서 WaitingList 조회(status가 wait인 것들만)
     @GetMapping("/api/main/getWaitingList/{groupId}")
     public WaitingListDto getWaitingList(@PathVariable Long groupId) {
         WaitingList waitingList = groupService.findOne(groupId).getWaitingList();
 
         return new WaitingListDto(waitingList);
+    }
+
+    //속해 있는 그룹 리스트 조회
+    @GetMapping("/api/main/getGroupList/{userId}")
+    public List<GroupSearchDto> GetGroupList(@PathVariable Long userId) {
+        List<GroupSearchDto> groupSearchDtoList = new ArrayList<>();
+        List<Group> findGroupList = groupService.groupByUser(userId);
+
+        for (Group group : findGroupList) {
+            GroupRole tempRole;
+            if (group.getHostId() == userId)
+                tempRole = GroupRole.HOST;
+            else
+                tempRole = GroupRole.GUEST;
+            groupSearchDtoList.add(new GroupSearchDto(group.getName(), group.getCode()
+                    , group.isOnAir(), tempRole));
+        }
+
+        return groupSearchDtoList;
     }
 
     @Data

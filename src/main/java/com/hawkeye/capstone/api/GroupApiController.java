@@ -36,10 +36,6 @@ public class GroupApiController {
         group.setAbsenceTime(request.getAbsenceTime());
         group.setAlertDuration(request.getAlertDuration());
 
-        //임시 호스트 생성
-        UserDto userDto = new UserDto("alahoon@naver.com", "김지훈", "123");
-        userService.join(userDto, "123");
-
         Long id = groupService.createGroup(group, userService.findOne(request.getUserId()));
         return new CreateGroupResponse(id, group.getCode());
     }
@@ -69,7 +65,7 @@ public class GroupApiController {
             if(queue.getWaitingList().getGroup().getId() == groupId){
                 //변경 감지 -> status REJECT로 변경
                 queueRepository.setStatus(queue, WaitingStatus.ACCEPT);
-                waitingListService.updateCount(queue.getWaitingList(), -1);
+                waitingListService.updateCount(queue, -1);
             }
         }
 
@@ -87,7 +83,7 @@ public class GroupApiController {
             if(queue.getWaitingList().getGroup().getId() == groupId){
                 //변경 감지 -> status REJECT로 변경
                 queueRepository.setStatus(queue, WaitingStatus.REJECT);
-                waitingListService.updateCount(queue.getWaitingList(), -1);
+                waitingListService.updateCount(queue, -1);
             }
         }
 

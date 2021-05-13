@@ -2,11 +2,18 @@ package com.hawkeye.capstone.api;
 
 import com.hawkeye.capstone.domain.User;
 import com.hawkeye.capstone.dto.UserDto;
+import com.hawkeye.capstone.dto.UserSearchDto;
+import com.hawkeye.capstone.jwt.JwtTokenProvider;
 import com.hawkeye.capstone.service.FileService;
 import com.hawkeye.capstone.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,22 +26,7 @@ public class UserApiController {
 
     private final UserService userService;
     private final FileService fileService;
-
-    //회원가입
-//    @PostMapping("/api/auth/register")
-//    public CreateUserResponse saveMember(@RequestBody @Valid CreateUserRequest request, @RequestParam("file") MultipartFile file){
-//
-//        User user = new User();
-//        user.setEmail(request.email);
-//        user.setName(request.name);
-//        user.setPassword(request.password);
-//        user.setImageDir(fileService.fileUpload(file));
-//        //user.setImage(request.image.getBytes(StandardCharsets.UTF_8));
-//        //System.out.println("request = " + request.image.getBytes(StandardCharsets.UTF_8));
-//
-//        Long id = userService.join(user, request.passwordConfirm);
-//        return new CreateUserResponse(id);
-//    }
+    private final JwtTokenProvider jwtTokenProvider;
 
     //회원가입
     @PostMapping("/api/auth/register")
@@ -44,55 +36,34 @@ public class UserApiController {
                                              @RequestParam("file") MultipartFile file) {
 
         UserDto userDto = new UserDto(email, name, fileService.fileUpload(file), password);
-
-//        User user = new User();
-//        user.setEmail(email);
-//        user.setName(name);
-//        user.setPassword(password);
-//        user.setImageDir(fileService.fileUpload(file));
-
-
-
         Long id = userService.join(userDto, passwordConfirm);
         return new CreateUserResponse(id);
     }
 
-
-    //로그인
-    @PostMapping("/api/auth/login")
-    public LogInResponse logIn(@RequestBody @Valid LogInRequest request) {
-        return new LogInResponse(userService.loadUserByEmail(request.getEmail(), request.getPassword()).getId());
-    }
-//
     //로그인 토큰
-//    @PostMapping("/api/auth/login")
-//    public ResponseEntity<TokenDto> logIn(@RequestBody @Valid LogInRequest request) {
-////        User user = userService.loadUserByEmail(request.getEmail(), request.getPassword());
-//
-//        User findUser = userService.findByEmail(request.getEmail());
-//
-//        UsernamePasswordAuthenticationToken authenticationToken =
-//                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword());
-//
-//        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-//        SecurityContextHolder.getContext().setAuthentication(authentication);
-//
-//        String jwt = tokenProvider.createToken(authentication);
-//
-//        HttpHeaders httpHeaders = new HttpHeaders();
-//        httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer" + jwt);
-//
-//        return new ResponseEntity<>(new TokenDto(jwt), httpHeaders, HttpStatus.OK);
-//    }
+    @PostMapping("/api/auth/login")
+    public String logIn(@RequestBody @Valid LogInRequest request) {
+
+        User findUser = userService.findByEmail(request.getEmail());
+
+        if(userService.loadUserByEmail(request.getEmail(), request.getPassword())){
+            return jwtTokenProvider.createToken(findUser.getUsername(), findUser.getRoles());
+        }
+
+        else{
+            throw new IllegalStateException("로그인에 실패했습니다.");
+        }
+
+    }
 
     //회원 조회
     @GetMapping("/api/mypage/{userId}")
-    public UserDto userSearch(@PathVariable("userId") Long userId) {
+    public UserSearchDto userSearch(@PathVariable("userId") Long userId) {
 
         User findUser = userService.findOne(userId);
         //User를 UserDto로 변환
-        UserDto userDto = new UserDto(findUser.getEmail(), findUser.getName(), findUser.getImageDir());
-        return userDto;
+        UserSearchDto userSearchDto = new UserSearchDto(findUser.getEmail(), findUser.getName(), findUser.getImageDir());
+        return userSearchDto;
     }
 
     //회원 정보 수정
@@ -105,26 +76,7 @@ public class UserApiController {
         return new UpdateUserResponse(findUser.getId(), findUser.getEmail());
     }
 
-    //회원 정보 수정
-//    @PatchMapping("/api/mypage/{userId}")
-//    public UpdateUserResponse updateUser(@PathVariable("userId") Long userId, @RequestBody @Valid UpdateUserRequest request){
-//
-//        userService.update(userId, request.getEmail(), request.getName(), request.getImageDir());
-//        User findUser = userService.findOne(userId);
-//        return new UpdateUserResponse(findUser.getId(), findUser.getEmail());
-//    }
-
-    //이미지 저장
-//    @PostMapping("/api/image/upload/{userId}")
-//    public Long imageUpload(@PathVariable("userId")Long userId, @RequestParam("file") MultipartFile file){
-//        String directory = fileService.fileUpload(file);
-//        tempDir = directory;
-//        userService.setImageDir(userId, directory);
-//
-//        return userId;
-//    }
-
-    //이미지 경로 불러오기
+    //프로필 이미지 경로 불러오기
     @GetMapping("/api/image/getImage/{userId}")
     public String getImage(@PathVariable("userId") Long userId) {
         User findUser = userService.findOne(userId);
@@ -166,22 +118,5 @@ public class UserApiController {
         public CreateUserResponse(Long id) {
             this.id = id;
         }
-    }
-
-    @Data
-    static class CreateUserRequest {
-
-        @NotEmpty
-        private String email;
-
-        @NotEmpty
-        private String name;
-
-        @NotEmpty
-        private String password;
-
-        @NotEmpty
-        private String passwordConfirm;
-
     }
 }
