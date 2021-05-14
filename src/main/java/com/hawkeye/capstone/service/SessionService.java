@@ -34,7 +34,6 @@ public class SessionService {
     @Transactional
     public Long endSession(Session session){
         session.setEndTime(LocalDateTime.now());
-        session.getGroup().getSessionList().remove(session);
         session.getGroup().setOnAir(false);
 
         return session.getId();

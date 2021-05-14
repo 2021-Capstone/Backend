@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,19 +36,9 @@ public class MainPageApiController {
 
     //속해 있는 그룹 리스트 조회
     @GetMapping("/api/main/getGroupList/{userId}")
-    public List<GroupSearchDto> GetGroupList(@PathVariable Long userId) {
-        List<GroupSearchDto> groupSearchDtoList = new ArrayList<>();
-        List<Group> findGroupList = groupService.groupByUser(userId);
+    public List<GroupSearchDto> getGroupList(@PathVariable Long userId) {
 
-        for (Group group : findGroupList) {
-            GroupRole tempRole;
-            if (group.getHostId() == userId)
-                tempRole = GroupRole.HOST;
-            else
-                tempRole = GroupRole.GUEST;
-            groupSearchDtoList.add(new GroupSearchDto(group.getName(), group.getCode()
-                    , group.isOnAir(), tempRole));
-        }
+        List<GroupSearchDto> groupSearchDtoList = groupService.getGroupListWithRole(userId);
 
         return groupSearchDtoList;
     }

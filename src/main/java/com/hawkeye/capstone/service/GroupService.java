@@ -1,8 +1,10 @@
 package com.hawkeye.capstone.service;
 
 import com.hawkeye.capstone.domain.*;
+import com.hawkeye.capstone.dto.GroupSearchDto;
 import com.hawkeye.capstone.repository.GroupRepository;
 import com.hawkeye.capstone.repository.QueueRepository;
+import com.hawkeye.capstone.repository.WaitingListRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +22,7 @@ public class GroupService {
 
     private final GroupRepository groupRepository;
     private final QueueRepository queueRepository;
+    private final WaitingListRepository waitingListRepository;
     private final UserService userService;
     private final WaitingListService waitingListService;
     private final QueueService queueService;
@@ -66,7 +69,7 @@ public class GroupService {
     }
 
     //그룹 찾기
-    public Group findOne(Long groupId){
+    public Group findOne(Long groupId) {
         return groupRepository.findOne(groupId);
     }
 
@@ -86,8 +89,10 @@ public class GroupService {
 
     //그룹 삭제
     @Transactional
-    public void deleteGroup(Long groupId){
-        groupRepository.delete(groupRepository.findOne(groupId));
+    public void deleteGroup(Long groupId) {
+        Group findGroup = groupRepository.findOne(groupId);
+        waitingListRepository.delete(findGroup.getWaitingList());
+        groupRepository.delete(findGroup);
     }
 
     //그룹 정보 변경
@@ -101,16 +106,32 @@ public class GroupService {
 
     //그룹 입장 신청
     @Transactional
-    public Long joinGroup(User user, String groupEnterCode){
-        if(groupRepository.findByCode(groupEnterCode).isEmpty()){
+    public Long joinGroup(User user, String groupEnterCode) {
+        if (groupRepository.findByCode(groupEnterCode).isEmpty()) {
             throw new IllegalStateException("해당 코드는 유효하지 않습니다.");
-        }
-        else{
+        } else {
             Group findGroup = groupRepository.findByCode(groupEnterCode).get(0);
             queueService.init(user, findGroup.getWaitingList());
 
             return findGroup.getId();
         }
+    }
+
+    //속한 그룹 리스트 조회 + 해당 그룹 내의 역할 분배
+    @Transactional
+    public List<GroupSearchDto> getGroupListWithRole(Long userId) {
+        List<Group> findGroupList = groupByUser(userId);
+        List<GroupSearchDto> groupSearchDtoList = new ArrayList<>();
+        for (Group group : findGroupList) {
+            GroupRole tempRole;
+            if (group.getHostId() == userId)
+                tempRole = GroupRole.HOST;
+            else
+                tempRole = GroupRole.GUEST;
+            groupSearchDtoList.add(new GroupSearchDto(group.getName(), group.getCode()
+                    , group.isOnAir(), tempRole));
+        }
+        return groupSearchDtoList;
     }
 
 }

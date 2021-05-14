@@ -1,9 +1,6 @@
 package com.hawkeye.capstone.repository;
 
-import com.hawkeye.capstone.domain.Queue;
-import com.hawkeye.capstone.domain.User;
-import com.hawkeye.capstone.domain.WaitingList;
-import com.hawkeye.capstone.domain.WaitingStatus;
+import com.hawkeye.capstone.domain.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,5 +48,9 @@ public class QueueRepository {
     public void setStatus(Queue queue, WaitingStatus waitingStatus){
         Queue one = findOne(queue.getId());
         one.setStatus(waitingStatus);
+    }
+
+    public void delete(Queue queue){
+        em.remove(queue);
     }
 }

@@ -26,8 +26,7 @@ public class WaitingListService {
     }
 
     @Transactional
-    public void updateCount(Queue queue, int value){
-        WaitingList waitingList = waitingListRepository.findByQueue(queue);
+    public void updateCount(WaitingList waitingList, int value){
         waitingList.countPlus(value);
     }
 }

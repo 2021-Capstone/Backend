@@ -1,5 +1,6 @@
 package com.hawkeye.capstone.repository;
 
+import com.hawkeye.capstone.domain.Group;
 import com.hawkeye.capstone.domain.Queue;
 import com.hawkeye.capstone.domain.WaitingList;
 import lombok.RequiredArgsConstructor;
@@ -30,4 +31,7 @@ public class WaitingListRepository {
                 .get(0);
     }
 
+    public void delete(WaitingList waitingList){
+        em.remove(waitingList);
+    }
 }

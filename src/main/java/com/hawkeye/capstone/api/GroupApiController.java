@@ -2,14 +2,13 @@ package com.hawkeye.capstone.api;
 
 import com.hawkeye.capstone.domain.*;
 import com.hawkeye.capstone.dto.UserDto;
+import com.hawkeye.capstone.dto.UserSearchDto;
 import com.hawkeye.capstone.repository.QueueRepository;
-import com.hawkeye.capstone.service.GroupService;
-import com.hawkeye.capstone.service.SessionService;
-import com.hawkeye.capstone.service.UserService;
-import com.hawkeye.capstone.service.WaitingListService;
+import com.hawkeye.capstone.service.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -24,6 +23,7 @@ public class GroupApiController {
     private final GroupService groupService;
     private final UserService userService;
     private final QueueRepository queueRepository;
+    private final QueueService queueService;
     private final WaitingListService waitingListService;
     private final SessionService sessionService;
 
@@ -57,17 +57,7 @@ public class GroupApiController {
     @PatchMapping("/api/group/allowMember/{groupId}")
     public AllowMemberResponse allowMember(@PathVariable("groupId") Long groupId, @RequestBody AllowMemberRequest request){
 
-        User findUser = userService.findByEmail(request.getEmail());
-        //해당 유저가 속한 Queue 전부 조회
-        List<Queue> queueList = queueRepository.findByUser(findUser.getId());
-        //각 Queue가 입장 신청을 한 그룹의 waitingList인지 조회
-        for (Queue queue : queueList) {
-            if(queue.getWaitingList().getGroup().getId() == groupId){
-                //변경 감지 -> status REJECT로 변경
-                queueRepository.setStatus(queue, WaitingStatus.ACCEPT);
-                waitingListService.updateCount(queue, -1);
-            }
-        }
+        queueService.allowMember(groupId, request.getEmail());
 
         return new AllowMemberResponse(groupId);
     }
@@ -75,17 +65,8 @@ public class GroupApiController {
     //그룹 입장 거절
     @PatchMapping("/api/group/rejectMember/{groupId}")
     public RejectMemberResponse rejectMember(@PathVariable("groupId")Long groupId, @RequestBody RejectMemberRequest request){
-        User findUser = userService.findByEmail(request.getEmail());
-        //해당 유저가 속한 Queue 전부 조회
-        List<Queue> queueList = queueRepository.findByUser(findUser.getId());
-        //각 Queue가 입장 신청을 한 그룹의 waitingList인지 조회
-        for (Queue queue : queueList) {
-            if(queue.getWaitingList().getGroup().getId() == groupId){
-                //변경 감지 -> status REJECT로 변경
-                queueRepository.setStatus(queue, WaitingStatus.REJECT);
-                waitingListService.updateCount(queue, -1);
-            }
-        }
+
+        queueService.rejectMember(groupId, request.getEmail());
 
         return new RejectMemberResponse(groupId);
     }
@@ -259,11 +240,12 @@ public class GroupApiController {
 
     @Data
     static class GroupMemberDto{
-        private List<UserDto> userDtoList = new ArrayList<>();
+        private List<UserSearchDto> userDtoList = new ArrayList<>();
 
         public GroupMemberDto(List<Queue> queueList){
             for (Queue queue : queueList) {
-                userDtoList.add(new UserDto(queue.getUser().getEmail(), queue.getUser().getName()));
+                userDtoList.add(new UserSearchDto(
+                        queue.getUser().getEmail(), queue.getUser().getName(), queue.getUser().getImageDir()));
             }
         }
 
