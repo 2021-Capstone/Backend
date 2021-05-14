@@ -91,6 +91,10 @@ public class GroupService {
     @Transactional
     public void deleteGroup(Long groupId) {
         Group findGroup = groupRepository.findOne(groupId);
+        List<Queue> findQueueList = findGroup.getWaitingList().getQueueList();
+        for (Queue queue : findQueueList) {
+            queueRepository.delete(queue);
+        }
         waitingListRepository.delete(findGroup.getWaitingList());
         groupRepository.delete(findGroup);
     }
