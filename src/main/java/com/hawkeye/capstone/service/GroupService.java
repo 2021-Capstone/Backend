@@ -1,7 +1,7 @@
 package com.hawkeye.capstone.service;
 
 import com.hawkeye.capstone.domain.*;
-import com.hawkeye.capstone.dto.GroupSearchDto;
+import com.hawkeye.capstone.dto.*;
 import com.hawkeye.capstone.repository.GroupRepository;
 import com.hawkeye.capstone.repository.QueueRepository;
 import com.hawkeye.capstone.repository.WaitingListRepository;
@@ -99,6 +99,54 @@ public class GroupService {
         groupRepository.delete(findGroup);
     }
 
+    //그룹 정보 조회
+    public GroupDetailDto searchGroup(Long groupId, Long userId){
+
+        Group findGroup = findOne(groupId);
+        if (findGroup.getHostId() == userId) {
+
+            GroupMemberDto findGroupMembers = getGroupMember(groupId);
+
+            List<GroupMemberSimpleDto> groupMemberSimpleDtoList = new ArrayList<>();
+            List<WaitingMemberDto> waitingMemberDtoList = new ArrayList<>();
+
+            List<UserSearchDto> findUserSearchDtoList = findGroupMembers.getUserSearchDtoList();
+            List<Queue> findQueueList = queueRepository.findByGroupWithUser(groupId);
+
+            for (Queue queue : findQueueList) {
+                waitingMemberDtoList.add(new WaitingMemberDto(queue.getUser().getName(), queue.getUser().getEmail()));
+            }
+
+            for (UserSearchDto userSearchDto : findUserSearchDtoList) {
+                groupMemberSimpleDtoList.add(new GroupMemberSimpleDto(userSearchDto.getName(), userSearchDto.getEmail()));
+            }
+
+
+            return new GroupDetailDto(GroupRole.HOST, userService.findOne(findGroup.getHostId()).getName(), findGroup.getCode(), findGroup.getName(),
+                    findGroup.getAbsenceTime(), findGroup.getAlertDuration(), groupMemberSimpleDtoList, waitingMemberDtoList);
+        }
+        else{
+            return new GroupDetailDto(GroupRole.HOST, userService.findOne(findGroup.getHostId()).getName(), findGroup.getCode(), findGroup.getName(),
+                    findGroup.getAbsenceTime(), findGroup.getAlertDuration());
+        }
+    }
+
+    //그룹 멤버 조회
+    public GroupMemberDto getGroupMember(Long groupId){
+        List<Queue> findQueueList = new ArrayList<>();
+
+        //해당 그룹의 모든 Queue조회
+        List<Queue> tempQueueList = queueRepository.findByGroupWithUser(groupId);
+        for (Queue queue : tempQueueList) {
+            //status가 ACCEPT인 큐만 골라내기
+            if (queue.getStatus() == WaitingStatus.ACCEPT) {
+                findQueueList.add(queue);
+            }
+        }
+        GroupMemberDto groupMemberDto = new GroupMemberDto(findQueueList);
+        return groupMemberDto;
+    }
+
     //그룹 정보 변경
     @Transactional
     public void updateGroup(Long groupId, String groupName, int absenceTime, int alertDuration) {
@@ -133,7 +181,7 @@ public class GroupService {
             else
                 tempRole = GroupRole.GUEST;
             groupSearchDtoList.add(new GroupSearchDto(group.getName(), group.getCode()
-                    , group.isOnAir(), tempRole));
+                    , group.isOnAir(), tempRole, group.getId()));
         }
         return groupSearchDtoList;
     }

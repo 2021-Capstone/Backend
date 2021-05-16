@@ -1,14 +1,12 @@
 package com.hawkeye.capstone.api;
 
 import com.hawkeye.capstone.domain.*;
-import com.hawkeye.capstone.dto.UserDto;
-import com.hawkeye.capstone.dto.UserSearchDto;
+import com.hawkeye.capstone.dto.*;
 import com.hawkeye.capstone.repository.QueueRepository;
 import com.hawkeye.capstone.service.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -48,14 +46,14 @@ public class GroupApiController {
 
     //그룹 입장 신청
     @PostMapping("/api/group/joinGroup/{userId}")
-    public JoinGroupResponse joinGroup(@Valid @PathVariable("userId") Long userId, @RequestBody JoinGroupRequest request){
+    public JoinGroupResponse joinGroup(@Valid @PathVariable("userId") Long userId, @RequestBody JoinGroupRequest request) {
         Long groupId = groupService.joinGroup(userService.findOne(userId), request.getGroupEnterCode());
         return new JoinGroupResponse(groupId);
     }
 
     //그룹 입장 수락
     @PatchMapping("/api/group/allowMember/{groupId}")
-    public AllowMemberResponse allowMember(@PathVariable("groupId") Long groupId, @RequestBody AllowMemberRequest request){
+    public AllowMemberResponse allowMember(@PathVariable("groupId") Long groupId, @RequestBody AllowMemberRequest request) {
 
         queueService.allowMember(groupId, request.getEmail());
 
@@ -64,7 +62,7 @@ public class GroupApiController {
 
     //그룹 입장 거절
     @PatchMapping("/api/group/rejectMember/{groupId}")
-    public RejectMemberResponse rejectMember(@PathVariable("groupId")Long groupId, @RequestBody RejectMemberRequest request){
+    public RejectMemberResponse rejectMember(@PathVariable("groupId") Long groupId, @RequestBody RejectMemberRequest request) {
 
         queueService.rejectMember(groupId, request.getEmail());
 
@@ -73,12 +71,12 @@ public class GroupApiController {
 
     //그룹 탈퇴
     @PatchMapping("/api/group/exitGroup/{groupId}")
-    public ExitGroupResponse exitGroup(@PathVariable("groupId")Long groupId, @RequestBody ExitGroupRequest request){
+    public ExitGroupResponse exitGroup(@PathVariable("groupId") Long groupId, @RequestBody ExitGroupRequest request) {
 
         //유저가 속한 Queue 전부 조회
         List<Queue> queueList = queueRepository.findByUser(request.getUserId());
         for (Queue queue : queueList) {
-            if(queue.getWaitingList().getGroup().getId() == groupId){
+            if (queue.getWaitingList().getGroup().getId() == groupId) {
                 //status EXIT으로 변경
                 queueRepository.setStatus(queue, WaitingStatus.EXIT);
             }
@@ -86,12 +84,12 @@ public class GroupApiController {
         return new ExitGroupResponse(request.getUserId());
     }
 
-   //그룹 정보 확인
-    @GetMapping("/api/group/getGroupInfo/{groupId}")
-    public GroupDto getGroupInfo(@PathVariable("groupId") Long groupId) {
-        Group findGroup = groupService.findOne(groupId);
-        GroupDto groupDto = new GroupDto(findGroup.getName(), findGroup.getCode(), findGroup.getAbsenceTime(), findGroup.getAlertDuration(), findGroup.isOnAir(), findGroup.getHostId());
-        return groupDto;
+    //유저가 속한 그룹 정보 확인
+    @PostMapping("/api/group/getGroupInfo")
+    public GroupDetailDto getGroupInfo(@RequestBody GroupDetailRequest groupDetailRequest) {
+
+        return groupService.searchGroup(groupDetailRequest.groupId, groupDetailRequest.userId);
+
     }
 
     //그룹 정보 수정
@@ -104,26 +102,14 @@ public class GroupApiController {
 
     //그룹의 유저 조회
     @GetMapping("/api/group/getGroupMember/{groupId}")
-    public GroupMemberDto getGroupMember(@PathVariable("groupId") Long groupId){
+    public GroupMemberDto getGroupMember(@PathVariable("groupId") Long groupId) {
 
-        List<Queue> findQueueList = new ArrayList<>();
-
-        //해당 그룹의 모든 Queue조회
-        List<Queue> tempQueueList = queueRepository.findByGroupWithUser(groupId);
-        for (Queue queue : tempQueueList) {
-            //status가 ACCEPT인 큐만 골라내기
-            if(queue.getStatus() == WaitingStatus.ACCEPT)
-            {
-                findQueueList.add(queue);
-            }
-        }
-        GroupMemberDto groupMemberDto = new GroupMemberDto(findQueueList);
-        return groupMemberDto;
+        return groupService.getGroupMember(groupId);
     }
 
     //수업 시작
     @PostMapping("/api/group/startSession/{groupId}")
-    public SessionDto startSession(@PathVariable("groupId")Long groupId){
+    public SessionDto startSession(@PathVariable("groupId") Long groupId) {
         Group findGroup = groupService.findOne(groupId);
         Long sessionId = sessionService.createSession(findGroup);
 
@@ -132,7 +118,7 @@ public class GroupApiController {
 
     //수업 종료
     @PatchMapping("/api/group/endSession/{sessionId}")
-    public SessionDto endSession(@PathVariable("sessionId")Long sessionId){
+    public SessionDto endSession(@PathVariable("sessionId") Long sessionId) {
         Session findSession = sessionService.findOne(sessionId);
 
         return new SessionDto(sessionService.endSession(findSession));
@@ -140,13 +126,19 @@ public class GroupApiController {
     }
 
     @Data
+    static class GroupDetailRequest{
+        private Long groupId;
+        private Long userId;
+    }
+
+    @Data
     @AllArgsConstructor
-    static class ExitGroupResponse{
+    static class ExitGroupResponse {
         private Long id;
     }
 
     @Data
-    static class ExitGroupRequest{
+    static class ExitGroupRequest {
         private Long userId;
     }
 
@@ -158,40 +150,40 @@ public class GroupApiController {
 
     @Data
     @AllArgsConstructor
-    static class RejectMemberResponse{
+    static class RejectMemberResponse {
         private Long id;
     }
 
     @Data
-    static class RejectMemberRequest{
+    static class RejectMemberRequest {
         private String email;
     }
 
     @Data
     @AllArgsConstructor
-    static class AllowMemberResponse{
+    static class AllowMemberResponse {
         private Long id;
     }
 
     @Data
-    static class AllowMemberRequest{
+    static class AllowMemberRequest {
         private String email;
     }
 
     @Data
     @AllArgsConstructor
-    static class JoinGroupResponse{
+    static class JoinGroupResponse {
         private Long id;
     }
 
     @Data
-    static class JoinGroupRequest{
+    static class JoinGroupRequest {
         private String groupEnterCode;
     }
 
     @Data
     @AllArgsConstructor
-    static class UpdateGroupInfoResponse{
+    static class UpdateGroupInfoResponse {
         private Long id;
         private String name;
         private int absenceTime;
@@ -199,7 +191,7 @@ public class GroupApiController {
     }
 
     @Data
-    static class UpdateGroupInfoRequest{
+    static class UpdateGroupInfoRequest {
         private String name;
         private int absenceTime;
         private int alertDuration;
@@ -237,19 +229,5 @@ public class GroupApiController {
         private boolean onAir;
         private Long hostId;
     }
-
-    @Data
-    static class GroupMemberDto{
-        private List<UserSearchDto> userDtoList = new ArrayList<>();
-
-        public GroupMemberDto(List<Queue> queueList){
-            for (Queue queue : queueList) {
-                userDtoList.add(new UserSearchDto(
-                        queue.getUser().getEmail(), queue.getUser().getName(), queue.getUser().getImageDir()));
-            }
-        }
-
-    }
-
 
 }

@@ -1,10 +1,14 @@
 package com.hawkeye.capstone.api;
 
+import com.hawkeye.capstone.domain.Group;
 import com.hawkeye.capstone.domain.User;
+import com.hawkeye.capstone.dto.GroupSearchDto;
 import com.hawkeye.capstone.dto.UserDto;
 import com.hawkeye.capstone.dto.UserSearchDto;
 import com.hawkeye.capstone.jwt.JwtTokenProvider;
+import com.hawkeye.capstone.repository.GroupRepository;
 import com.hawkeye.capstone.service.FileService;
+import com.hawkeye.capstone.service.GroupService;
 import com.hawkeye.capstone.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,6 +31,7 @@ public class UserApiController {
 
     private final UserService userService;
     private final FileService fileService;
+    private final GroupService groupService;
     private final JwtTokenProvider jwtTokenProvider;
 
     //회원가입
@@ -42,12 +48,17 @@ public class UserApiController {
 
     //로그인 토큰
     @PostMapping("/api/auth/login")
-    public String logIn(@RequestBody @Valid LogInRequest request) {
+    public LogInResponse logIn(@RequestBody @Valid LogInRequest request) {
 
         User findUser = userService.findByEmail(request.getEmail());
 
         if(userService.loadUserByEmail(request.getEmail(), request.getPassword())){
-            return jwtTokenProvider.createToken(findUser.getUsername(), findUser.getRoles());
+            //토큰 생성
+            String token = jwtTokenProvider.createToken(findUser.getUsername(), findUser.getRoles());
+
+            List<GroupSearchDto> groupSearchDtoList = groupService.getGroupListWithRole(findUser.getId());
+
+            return new LogInResponse(findUser.getName(), findUser.getImageDir(), token, findUser.getId());
         }
 
         else{
@@ -61,7 +72,7 @@ public class UserApiController {
     public UserSearchDto userSearch(@PathVariable("userId") Long userId) {
 
         User findUser = userService.findOne(userId);
-        //User를 UserDto로 변환
+        //User를 UserSearchDto로 변환
         UserSearchDto userSearchDto = new UserSearchDto(findUser.getEmail(), findUser.getName(), findUser.getImageDir());
         return userSearchDto;
     }
@@ -86,7 +97,16 @@ public class UserApiController {
     @Data
     @AllArgsConstructor
     static class LogInResponse {
-        private Long id;
+        private String name;
+        private String profileImage;
+        private String token;
+        private Long userId;
+    }
+
+    @Data
+    @AllArgsConstructor
+    static class GroupDto{
+        private Long groupId;
     }
 
     @Data

@@ -2,6 +2,7 @@ package com.hawkeye.capstone.repository;
 
 import com.hawkeye.capstone.domain.Group;
 import com.hawkeye.capstone.domain.User;
+import com.hawkeye.capstone.domain.WaitingList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
