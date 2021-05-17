@@ -31,6 +31,8 @@ public class UserService {
                 .name(userDto.getName())
                 .password(userDto.getPassword())
                 .imageDir(userDto.getImageDir())
+                .imageDir2(userDto.getImageDir2())
+                .imageDir3(userDto.getImageDir3())
                 .roles(Collections.singletonList("ROLE_USER"))
                 .build();
 
@@ -60,12 +62,15 @@ public class UserService {
      * 회원 정보 수정
      */
     @Transactional //회원 정보 폼에서 데이터 가져와서 수정(변경 감지)
-    public void update(Long id, String email, String name, String imageDir) {
+    public void update(Long id, String email, String name, String imageDir1,
+                       String imageDir2, String imageDir3) {
         User user = userRepository.findOne(id);
         user.setEmail(email);
         user.setName(name);
         //user.setImage(image.getBytes(StandardCharsets.UTF_8));
-        user.setImageDir(imageDir);
+        user.setImageDir(imageDir1);
+        user.setImageDir2(imageDir2);
+        user.setImageDir3(imageDir3);
     }
 
     /**
@@ -82,10 +87,10 @@ public class UserService {
     /**
      * 이미지 경로 저장
      */
-    @Transactional
-    public void setImageDir(User user, String directory) {
-        user.setImageDir(directory);
-    }
+//    @Transactional
+//    public void setImageDir(User user, String directory) {
+//        user.setImageDir(directory);
+//    }
 
     /**
      * 로그인

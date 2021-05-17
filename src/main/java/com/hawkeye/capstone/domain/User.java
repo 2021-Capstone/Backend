@@ -41,8 +41,14 @@ public class User implements UserDetails {
     @Column(name = "user_name", nullable = false)
     private String name;
 
-    @Column(name = "image_directory")
+    @Column(name = "image_directory_1")
     private String imageDir;
+
+    @Column(name = "image_directory_2")
+    private String imageDir2;
+
+    @Column(name = "image_directory_3")
+    private String imageDir3;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @Builder.Default

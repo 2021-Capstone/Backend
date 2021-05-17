@@ -26,5 +26,5 @@ logging.level:
 
 app:
   upload:
-    dir: C:\Users\KJH\Documents\Capstone\Backend-master\image
-    #dir: D:\Capstone\Image\
+    #dir: C:\Users\KJH\Documents\Capstone\Backend-master\image
+    dir: D:\Capstone\Image\

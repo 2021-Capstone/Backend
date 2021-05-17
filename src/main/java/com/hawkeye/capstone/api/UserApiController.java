@@ -7,6 +7,7 @@ import com.hawkeye.capstone.dto.UserDto;
 import com.hawkeye.capstone.dto.UserSearchDto;
 import com.hawkeye.capstone.jwt.JwtTokenProvider;
 import com.hawkeye.capstone.repository.GroupRepository;
+import com.hawkeye.capstone.repository.UserRepository;
 import com.hawkeye.capstone.service.FileService;
 import com.hawkeye.capstone.service.GroupService;
 import com.hawkeye.capstone.service.UserService;
@@ -18,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,18 +35,36 @@ public class UserApiController {
     private final FileService fileService;
     private final GroupService groupService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final UserRepository userRepository;
 
     //회원가입
     @PostMapping("/api/auth/register")
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     public CreateUserResponse registerMember(@RequestParam("email") String email, @RequestParam("name") String name,
                                              @RequestParam("password") String password, @RequestParam("passwordConfirm") String passwordConfirm,
-                                             @RequestParam("file") MultipartFile file) {
+                                             @RequestParam("file1") MultipartFile file1, @RequestParam("file2") MultipartFile file2,
+                                             @RequestParam("file3") MultipartFile file3){
 
-        UserDto userDto = new UserDto(email, name, fileService.fileUpload(file), password);
+        UserDto userDto = new UserDto(email, name, fileService.fileUpload(file1),
+                fileService.fileUpload(file2), fileService.fileUpload(file3), password);
+
         Long id = userService.join(userDto, passwordConfirm);
+
         return new CreateUserResponse(id);
     }
+
+    //CORS 테스트
+//    @Transactional
+//    @PostMapping("/api/auth/register")
+//    public void registerMember(@RequestParam("email") String email, @RequestParam("name") String name,
+//                                             @RequestParam("password") String password, @RequestParam("passwordConfirm") String passwordConfirm){
+//
+//        User user = new User();
+//        user.setEmail(email);
+//        user.setName(name);
+//        user.setPassword(password);
+//
+//        userRepository.save(user);
+//    }
 
     //로그인 토큰
     @PostMapping("/api/auth/login")
@@ -80,9 +100,11 @@ public class UserApiController {
     //회원 정보 수정
     @PatchMapping("/api/mypage/{userId}")
     public UpdateUserResponse updateUser(@PathVariable("userId") Long userId, @RequestParam("email") String email,
-                                         @RequestParam("name") String name, @RequestParam("file") MultipartFile file) {
+                                         @RequestParam("name") String name, @RequestParam("file1") MultipartFile file1,
+                                         @RequestParam("file2") MultipartFile file2, @RequestParam("file3") MultipartFile file3) {
 
-        userService.update(userId, email, name, fileService.fileUpload(file));
+        userService.update(userId, email, name, fileService.fileUpload(file1),
+                fileService.fileUpload(file2), fileService.fileUpload(file3));
         User findUser = userService.findOne(userId);
         return new UpdateUserResponse(findUser.getId(), findUser.getEmail());
     }
