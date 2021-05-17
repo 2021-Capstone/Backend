@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -17,12 +16,27 @@ public class TimeLineLog {
     private int id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "guest_history_id")
-    private GuestHistory guestHistory;
+    @JoinColumn(name = "history_id")
+    private History history;
 
-    @Column(name = "log_start_time")
-    private LocalDateTime startTime;
+    private String state;
 
-    @Column(name = "log_end_time")
-    private LocalDateTime endTime;
+    @Column(name = "log_start_hour")
+    private int startHour;
+
+    @Column(name = "log_start_minute")
+    private int startMinute;
+
+    @Column(name = "log_start_second")
+    private int startSecond;
+
+    @Column(name = "log_end_hour")
+    private int endHour;
+
+    @Column(name = "log_end_minute")
+    private int endMinute;
+
+    @Column(name = "log_end_second")
+    private int endSecond;
+
 }

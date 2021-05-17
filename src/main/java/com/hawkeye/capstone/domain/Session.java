@@ -5,6 +5,8 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -25,6 +27,9 @@ public class Session {
 
     @Column(name = "session_end_time")
     private LocalDateTime endTime;
+
+    @OneToMany(mappedBy = "session")
+    private List<History> historyList = new ArrayList<>();
 
     public void setGroup(Group group){
         this.setGroup(group);
