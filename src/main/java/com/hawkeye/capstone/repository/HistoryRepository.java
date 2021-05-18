@@ -24,6 +24,11 @@ public class HistoryRepository {
         return em.find(History.class, historyId);
     }
 
+    public List<History> findAll(){
+        return em.createQuery("select h from History h", History.class)
+                .getResultList();
+    }
+
     //수업의 Guest 히스토리 하나 검색
     public History findByGuestInSession(Long userId, Long sessionId){
 

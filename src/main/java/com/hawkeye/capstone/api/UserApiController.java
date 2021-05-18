@@ -38,33 +38,33 @@ public class UserApiController {
     private final UserRepository userRepository;
 
     //회원가입
-//    @PostMapping("/api/auth/register")
-//    public CreateUserResponse registerMember(@RequestParam("email") String email, @RequestParam("name") String name,
-//                                             @RequestParam("password") String password, @RequestParam("passwordConfirm") String passwordConfirm,
-//                                             @RequestParam("file1") MultipartFile file1, @RequestParam("file2") MultipartFile file2,
-//                                             @RequestParam("file3") MultipartFile file3){
-//
-//        UserDto userDto = new UserDto(email, name, fileService.fileUpload(file1),
-//                fileService.fileUpload(file2), fileService.fileUpload(file3), password);
-//
-//        Long id = userService.join(userDto, passwordConfirm);
-//
-//        return new CreateUserResponse(id);
-//    }
+    @PostMapping("/api/auth/register")
+    public CreateUserResponse registerMember(@RequestParam("email") String email, @RequestParam("name") String name,
+                                             @RequestParam("password") String password, @RequestParam("passwordConfirm") String passwordConfirm,
+                                             @RequestParam("file1") MultipartFile file1, @RequestParam("file2") MultipartFile file2,
+                                             @RequestParam("file3") MultipartFile file3){
+
+        UserDto userDto = new UserDto(email, name, fileService.fileUpload(file1),
+                fileService.fileUpload(file2), fileService.fileUpload(file3), password);
+
+        Long id = userService.join(userDto, passwordConfirm);
+
+        return new CreateUserResponse(id);
+    }
 
     //CORS 테스트
-    @Transactional
-    @PostMapping("/api/auth/register")
-    public void registerMember(@RequestParam("email") String email, @RequestParam("name") String name,
-                                             @RequestParam("password") String password, @RequestParam("passwordConfirm") String passwordConfirm){
-
-        User user = new User();
-        user.setEmail(email);
-        user.setName(name);
-        user.setPassword(password);
-
-        userRepository.save(user);
-    }
+//    @Transactional
+//    @PostMapping("/api/auth/register")
+//    public void registerMember(@RequestParam("email") String email, @RequestParam("name") String name,
+//                                             @RequestParam("password") String password, @RequestParam("passwordConfirm") String passwordConfirm){
+//
+//        User user = new User();
+//        user.setEmail(email);
+//        user.setName(name);
+//        user.setPassword(password);
+//
+//        userRepository.save(user);
+//    }
 
     //로그인 토큰
     @PostMapping("/api/auth/login")

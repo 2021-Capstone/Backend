@@ -1,10 +1,9 @@
 package com.hawkeye.capstone.domain;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +11,8 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class History {
 
     @Id
@@ -30,11 +31,14 @@ public class History {
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "host_history_id")
 //    private HostHistory hostHistory;
+    private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "history")
-    private List<TimeLineLog> timeLineLogList = new ArrayList<>();
+    private List<TimeLineLog> timeLineLogList;
 
     private int attendanceCount;
+
+    private int attitude;
 
     private int vibe;
 
@@ -44,15 +48,17 @@ public class History {
     @Embedded
     private YawGraph yawGraph;
 
-    private boolean attendance;
+    private boolean isAttend;
 
     public int getAbsenceTime(){
 
         int time = 0;
 
         for(TimeLineLog timeLineLog : timeLineLogList){
-            time += timeLineLog.getEndHour() - timeLineLog.getStartHour() * 60;
-            time += timeLineLog.getEndMinute() - timeLineLog.getStartMinute();
+            if(timeLineLog.getState() == "absence"){
+                time += timeLineLog.getEndHour() - timeLineLog.getStartHour() * 60;
+                time += timeLineLog.getEndMinute() - timeLineLog.getStartMinute();
+            }
         }
 
         return time;

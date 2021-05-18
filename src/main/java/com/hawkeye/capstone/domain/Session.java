@@ -31,8 +31,4 @@ public class Session {
     @OneToMany(mappedBy = "session")
     private List<History> historyList = new ArrayList<>();
 
-    public void setGroup(Group group){
-        this.setGroup(group);
-        group.getSessionList().add(this); //어차피 한 그룹에서 수업은 하나만 할 수 있긴 함
-    }
 }

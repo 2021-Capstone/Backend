@@ -14,9 +14,12 @@ public class YawGraph {
     private float yawNormal;
     private float yawRight;
 
-    public YawGraph(float yawLeft, float yawNormal, float yawRight) {
-        this.yawLeft = yawLeft;
-        this.yawNormal = yawNormal;
-        this.yawRight = yawRight;
+    public YawGraph() {
+    }
+
+    public YawGraph(float left, float normal, float right) {
+        this.yawLeft = left;
+        this.yawNormal = normal;
+        this.yawRight = right;
     }
 }

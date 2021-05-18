@@ -1,5 +1,6 @@
 package com.hawkeye.capstone.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,6 +18,7 @@ public class TimeLineLog {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "history_id")
+    @JsonIgnore
     private History history;
 
     private String state;
