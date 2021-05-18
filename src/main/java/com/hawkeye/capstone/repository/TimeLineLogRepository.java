@@ -21,9 +21,11 @@ public class TimeLineLogRepository {
     }
 
     public List<TimeLineLog> findByHistory(Long historyId){
+
         return em.createQuery("select t from TimeLineLog t " +
                 "where t.history = :history", TimeLineLog.class)
                 .setParameter("history", historyRepository.findOne(historyId))
                 .getResultList();
+
     }
 }

@@ -38,8 +38,6 @@ public class HistoryService {
         User findUser = userRepository.findOne(userId);
         Session findSession = sessionRepository.findOne(sessionId);
 
-
-
         History history = History.builder()
                 .user(findUser)
                 .session(findSession)
@@ -94,6 +92,8 @@ public class HistoryService {
                 historyDtoList.add(new HistoryDto(GroupRole.HOST, history.getId(),
                         history.getSession().getGroup().getName(), history.getCreatedAt(),
                         history.getAttendanceCount(), history.getVibe(), historyGroupMemberDtoList));
+
+                break;
             }
 
             //GUEST가 호출한 경우
@@ -114,11 +114,13 @@ public class HistoryService {
 
         for (TimeLineLog timeLineLog : findLogList) {
 
-            if(timeLineLog.getState() == "absence"){
+            if(timeLineLog.getState().equals("absence")){
+
                 time += timeLineLog.getEndHour() - timeLineLog.getStartHour() * 60;
                 time += timeLineLog.getEndMinute() - timeLineLog.getStartMinute();
                 System.out.println("==============================");
                 System.out.println("time = " + time);
+
             }
 
         }

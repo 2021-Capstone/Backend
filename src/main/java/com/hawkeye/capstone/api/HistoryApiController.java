@@ -104,5 +104,7 @@ public class HistoryApiController {
         private RollGraph roll;
         private YawGraph yaw;
 
+
+
     }
 }
