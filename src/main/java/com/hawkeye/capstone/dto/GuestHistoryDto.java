@@ -7,6 +7,7 @@ import com.hawkeye.capstone.domain.YawGraph;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -19,7 +20,7 @@ public class GuestHistoryDto {
     private int attendanceCount;
     private int vibe;
     private boolean isAttendance;
-    private List<TimeLineLog> timeLineLogList;
+    private List<TimeLineLog> timeLineLogList = new ArrayList<>();
     private RollGraph roll;
     private YawGraph yaw;
 
