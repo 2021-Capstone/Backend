@@ -118,8 +118,6 @@ public class HistoryService {
 
                 time += timeLineLog.getEndHour() - timeLineLog.getStartHour() * 60;
                 time += timeLineLog.getEndMinute() - timeLineLog.getStartMinute();
-                System.out.println("==============================");
-                System.out.println("time = " + time);
 
             }
 
