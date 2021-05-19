@@ -71,7 +71,8 @@ public class UserApiController {
 
             List<GroupSearchDto> groupSearchDtoList = groupService.getGroupListWithRole(findUser.getId());
 
-            return new LogInResponse(findUser.getName(), findUser.getImageDir(), findUser.getEmail(), token, findUser.getId());
+            return new LogInResponse(findUser.getName(), fileService.fileUpload(findUser.getImageDir()),
+                    findUser.getEmail(), token, findUser.getId());
         }
 
         else{
@@ -116,7 +117,7 @@ public class UserApiController {
     @AllArgsConstructor
     static class LogInResponse {
         private String name;
-        private String profileImage;
+        private byte[] profileImage;
         private String email;
         private String token;
         private Long userId;

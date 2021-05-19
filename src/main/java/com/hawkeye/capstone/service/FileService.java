@@ -51,6 +51,8 @@ public class FileService {
             FileInputStream fileInputStream = new FileInputStream(sourceImage);
             fileInputStream.read(bytes);
 
+            fileInputStream.close();
+
             return Base64.encodeBase64(bytes);
 
         }catch (Exception e){
