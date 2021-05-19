@@ -99,6 +99,22 @@ public class GroupService {
         groupRepository.delete(findGroup);
     }
 
+    //그룹 웨이팅리스트 조회
+    public List<WaitingMemberDto> getGroupWaitingList(Long groupId){
+        Group findGroup = findOne(groupId);
+
+        List<WaitingMemberDto> waitingMemberDtoList = new ArrayList<>();
+
+        List<Queue> findQueueList = queueRepository.findByGroupWithUser(groupId);
+
+        for (Queue queue : findQueueList) {
+            if (queue.getStatus() == WaitingStatus.WAIT)
+                waitingMemberDtoList.add(new WaitingMemberDto(queue.getUser().getName(), queue.getUser().getEmail()));
+        }
+
+        return waitingMemberDtoList;
+    }
+
     //그룹 정보 조회
     public GroupDetailDto searchGroup(Long groupId, Long userId) {
 

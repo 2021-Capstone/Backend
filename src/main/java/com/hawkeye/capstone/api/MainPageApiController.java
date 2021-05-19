@@ -54,12 +54,12 @@ public class MainPageApiController {
     }
 
     //host 입장에서 WaitingList 조회(status가 wait인 것들만)
-    @GetMapping("/api/main/getGroupWaitingList/{groupId}")
-    public HostWaitingListDto getWaitingList(@PathVariable Long groupId) {
-        WaitingList waitingList = groupService.findOne(groupId).getWaitingList();
-
-        return new HostWaitingListDto(waitingList);
-    }
+//    @GetMapping("/api/main/getGroupWaitingList/{groupId}")
+//    public HostWaitingListDto getWaitingList(@PathVariable Long groupId) {
+//        WaitingList waitingList = groupService.findOne(groupId).getWaitingList();
+//
+//        return new HostWaitingListDto(waitingList);
+//    }
 
     //속해 있는 그룹 리스트 조회
     @GetMapping("/api/main/getGroupList/{userId}")
@@ -94,25 +94,25 @@ public class MainPageApiController {
         return new RecentTrendDto(GroupRole.GUEST, 70, 50, 30);
     }
 
-    @Data
-    static class HostWaitingListDto {
-
-        private int count;
-        private String groupName;
-        private List<QueueDto> queueList;
-
-        public HostWaitingListDto(WaitingList waitingList) {
-            count = waitingList.getCount();
-            groupName = waitingList.getGroup().getName();
-            List<QueueDto> queueListAll = waitingList.getQueueList().stream()
-                    .map(queue -> new QueueDto(queue))
-                    .collect(Collectors.toList());
-            for (QueueDto queueDto : queueListAll) {
-                if (queueDto.getWaitingStatus() == WaitingStatus.WAIT)
-                    queueList.add(queueDto);
-            }
-        }
-    }
+//    @Data
+//    static class HostWaitingListDto {
+//
+//        private int count;
+//        private String groupName;
+//        private List<QueueDto> queueList;
+//
+//        public HostWaitingListDto(WaitingList waitingList) {
+//            count = waitingList.getCount();
+//            groupName = waitingList.getGroup().getName();
+//            List<QueueDto> queueListAll = waitingList.getQueueList().stream()
+//                    .map(queue -> new QueueDto(queue))
+//                    .collect(Collectors.toList());
+//            for (QueueDto queueDto : queueListAll) {
+//                if (queueDto.getWaitingStatus() == WaitingStatus.WAIT)
+//                    queueList.add(queueDto);
+//            }
+//        }
+//    }
 
     @Data
     static class QueueDto {

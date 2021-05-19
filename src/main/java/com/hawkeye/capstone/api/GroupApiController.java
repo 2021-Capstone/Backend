@@ -69,6 +69,13 @@ public class GroupApiController {
         return new RejectMemberResponse(groupId);
     }
 
+    //그룹 대기열 조회
+    @GetMapping("/api/group/getWaitingList/{groupId}")
+    public List<WaitingMemberDto> getGroupWaitingList(@PathVariable("groupId") Long groupId){
+
+        return groupService.getGroupWaitingList(groupId);
+    }
+
     //그룹 탈퇴
     @PatchMapping("/api/group/exitGroup/{groupId}")
     public ExitGroupResponse exitGroup(@PathVariable("groupId") Long groupId, @RequestBody ExitGroupRequest request) {
