@@ -100,7 +100,7 @@ public class GroupService {
     }
 
     //그룹 정보 조회
-    public GroupDetailDto searchGroup(Long groupId, Long userId){
+    public GroupDetailDto searchGroup(Long groupId, Long userId) {
 
         Group findGroup = findOne(groupId);
         if (findGroup.getHostId() == userId) {
@@ -114,7 +114,8 @@ public class GroupService {
             List<Queue> findQueueList = queueRepository.findByGroupWithUser(groupId);
 
             for (Queue queue : findQueueList) {
-                waitingMemberDtoList.add(new WaitingMemberDto(queue.getUser().getName(), queue.getUser().getEmail()));
+                if (queue.getStatus() == WaitingStatus.WAIT)
+                    waitingMemberDtoList.add(new WaitingMemberDto(queue.getUser().getName(), queue.getUser().getEmail()));
             }
 
             for (UserSearchDto userSearchDto : findUserSearchDtoList) {
@@ -124,15 +125,14 @@ public class GroupService {
 
             return new GroupDetailDto(GroupRole.HOST, userService.findOne(findGroup.getHostId()).getName(), findGroup.getCode(), findGroup.getName(),
                     findGroup.getAbsenceTime(), findGroup.getAlertDuration(), groupMemberSimpleDtoList, waitingMemberDtoList);
-        }
-        else{
+        } else {
             return new GroupDetailDto(GroupRole.HOST, userService.findOne(findGroup.getHostId()).getName(), findGroup.getCode(), findGroup.getName(),
                     findGroup.getAbsenceTime(), findGroup.getAlertDuration());
         }
     }
 
     //그룹 멤버 조회
-    public GroupMemberDto getGroupMember(Long groupId){
+    public GroupMemberDto getGroupMember(Long groupId) {
         List<Queue> findQueueList = new ArrayList<>();
 
         //해당 그룹의 모든 Queue조회
