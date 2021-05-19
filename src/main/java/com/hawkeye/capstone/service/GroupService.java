@@ -119,6 +119,8 @@ public class GroupService {
     public GroupDetailDto searchGroup(Long groupId, Long userId) {
 
         Group findGroup = findOne(groupId);
+
+        //호출한 유저가 HOST
         if (findGroup.getHostId() == userId) {
 
             GroupMemberDto findGroupMembers = getGroupMember(groupId);
@@ -141,8 +143,12 @@ public class GroupService {
 
             return new GroupDetailDto(GroupRole.HOST, userService.findOne(findGroup.getHostId()).getName(), findGroup.getCode(), findGroup.getName(),
                     findGroup.getAbsenceTime(), findGroup.getAlertDuration(), groupMemberSimpleDtoList, waitingMemberDtoList);
-        } else {
-            return new GroupDetailDto(GroupRole.HOST, userService.findOne(findGroup.getHostId()).getName(), findGroup.getCode(), findGroup.getName(),
+        }
+
+        //호출한 유저가 GUEST
+
+        else {
+            return new GroupDetailDto(GroupRole.GUEST, userService.findOne(findGroup.getHostId()).getName(), findGroup.getCode(), findGroup.getName(),
                     findGroup.getAbsenceTime(), findGroup.getAlertDuration());
         }
     }

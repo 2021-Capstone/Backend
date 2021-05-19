@@ -52,7 +52,7 @@ public class GroupApiController {
     }
 
     //그룹 입장 수락
-    @PatchMapping("/api/group/allowMember/{groupId}")
+    @PostMapping("/api/group/allowMember/{groupId}")
     public AllowMemberResponse allowMember(@PathVariable("groupId") Long groupId, @RequestBody AllowMemberRequest request) {
 
         queueService.allowMember(groupId, request.getEmail());
@@ -61,7 +61,7 @@ public class GroupApiController {
     }
 
     //그룹 입장 거절
-    @PatchMapping("/api/group/rejectMember/{groupId}")
+    @PostMapping("/api/group/rejectMember/{groupId}")
     public RejectMemberResponse rejectMember(@PathVariable("groupId") Long groupId, @RequestBody RejectMemberRequest request) {
 
         queueService.rejectMember(groupId, request.getEmail());
@@ -77,7 +77,7 @@ public class GroupApiController {
     }
 
     //그룹 탈퇴
-    @PatchMapping("/api/group/exitGroup/{groupId}")
+    @PostMapping("/api/group/exitGroup/{groupId}")
     public ExitGroupResponse exitGroup(@PathVariable("groupId") Long groupId, @RequestBody ExitGroupRequest request) {
 
         //유저가 속한 Queue 전부 조회
@@ -100,11 +100,12 @@ public class GroupApiController {
     }
 
     //그룹 정보 수정
-    @PatchMapping("/api/group/editGroupInfo/{groupId}")
-    public UpdateGroupInfoResponse updateGroupInfo(@PathVariable("groupId") Long groupId, @RequestBody UpdateGroupInfoRequest request) {
+    @PostMapping("/api/group/editGroupInfo/{groupId}")
+    public GroupDetailDto updateGroupInfo(@PathVariable("groupId") Long groupId, @RequestBody UpdateGroupInfoRequest request) {
+
         groupService.updateGroup(groupId, request.getName(), request.getAbsenceTime(), request.getAlertDuration());
-        Group findGroup = groupService.findOne(groupId);
-        return new UpdateGroupInfoResponse(findGroup.getId(), findGroup.getName(), findGroup.getAbsenceTime(), findGroup.getAlertDuration());
+
+        return groupService.searchGroup(groupId, groupService.findOne(groupId).getHostId());
     }
 
     //그룹의 유저 조회
@@ -124,7 +125,7 @@ public class GroupApiController {
     }
 
     //수업 종료
-    @PatchMapping("/api/group/endSession/{sessionId}")
+    @PostMapping("/api/group/endSession/{sessionId}")
     public SessionDto endSession(@PathVariable("sessionId") Long sessionId) {
         Session findSession = sessionService.findOne(sessionId);
 

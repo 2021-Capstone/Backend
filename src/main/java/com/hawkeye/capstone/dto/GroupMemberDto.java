@@ -13,7 +13,7 @@ public class GroupMemberDto {
     public GroupMemberDto(List<Queue> queueList) {
         for (Queue queue : queueList) {
             userSearchDtoList.add(new UserSearchDto(
-                    queue.getUser().getEmail(), queue.getUser().getName(), queue.getUser().getImageDir()));
+                    queue.getUser().getEmail(), queue.getUser().getName()));
         }
     }
 }

@@ -1,12 +1,10 @@
 package com.hawkeye.capstone.api;
 
-import com.hawkeye.capstone.domain.Group;
 import com.hawkeye.capstone.domain.User;
 import com.hawkeye.capstone.dto.GroupSearchDto;
 import com.hawkeye.capstone.dto.UserDto;
 import com.hawkeye.capstone.dto.UserSearchDto;
 import com.hawkeye.capstone.jwt.JwtTokenProvider;
-import com.hawkeye.capstone.repository.GroupRepository;
 import com.hawkeye.capstone.repository.UserRepository;
 import com.hawkeye.capstone.service.FileService;
 import com.hawkeye.capstone.service.GroupService;
@@ -14,17 +12,12 @@ import com.hawkeye.capstone.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
+import java.awt.image.BufferedImage;
 import java.util.List;
 
 @RestController
@@ -44,8 +37,8 @@ public class UserApiController {
                                              @RequestParam("file1") MultipartFile file1, @RequestParam("file2") MultipartFile file2,
                                              @RequestParam("file3") MultipartFile file3){
 
-        UserDto userDto = new UserDto(email, name, fileService.fileUpload(file1),
-                fileService.fileUpload(file2), fileService.fileUpload(file3), password);
+        UserDto userDto = new UserDto(email, name, fileService.fileDownLoad(file1),
+                fileService.fileDownLoad(file2), fileService.fileDownLoad(file3), password);
 
         Long id = userService.join(userDto, passwordConfirm);
 
@@ -93,27 +86,30 @@ public class UserApiController {
 
         User findUser = userService.findOne(userId);
         //User를 UserSearchDto로 변환
-        UserSearchDto userSearchDto = new UserSearchDto(findUser.getEmail(), findUser.getName(), findUser.getImageDir());
+        UserSearchDto userSearchDto = new UserSearchDto(findUser.getEmail(), findUser.getName(),
+                findUser.getImageDir(), findUser.getImageDir2(), findUser.getImageDir3());
         return userSearchDto;
     }
 
     //회원 정보 수정
-    @PatchMapping("/api/mypage/{userId}")
-    public UpdateUserResponse updateUser(@PathVariable("userId") Long userId, @RequestParam("email") String email,
+    @PostMapping("/api/mypage/{userId}")
+    public UserSearchDto updateUser(@PathVariable("userId") Long userId, @RequestParam("email") String email,
                                          @RequestParam("name") String name, @RequestParam("file1") MultipartFile file1,
                                          @RequestParam("file2") MultipartFile file2, @RequestParam("file3") MultipartFile file3) {
 
-        userService.update(userId, email, name, fileService.fileUpload(file1),
-                fileService.fileUpload(file2), fileService.fileUpload(file3));
+        userService.update(userId, email, name, fileService.fileDownLoad(file1),
+                fileService.fileDownLoad(file2), fileService.fileDownLoad(file3));
         User findUser = userService.findOne(userId);
-        return new UpdateUserResponse(findUser.getId(), findUser.getEmail());
+        return new UserSearchDto(findUser.getEmail(), findUser.getName(),
+                findUser.getImageDir(), findUser.getImageDir2(), findUser.getImageDir3());
     }
 
     //프로필 이미지 경로 불러오기
     @GetMapping("/api/image/getImage/{userId}")
-    public String getImage(@PathVariable("userId") Long userId) {
+    public byte[] getImage(@PathVariable("userId") Long userId) {
         User findUser = userService.findOne(userId);
-        return findUser.getImageDir();
+
+        return fileService.fileUpload(findUser.getImageDir());
     }
 
     @Data
