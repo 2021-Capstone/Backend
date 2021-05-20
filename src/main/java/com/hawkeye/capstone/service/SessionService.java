@@ -32,7 +32,8 @@ public class SessionService {
     }
 
     @Transactional
-    public Long endSession(Session session){
+    public Long endSession(Long sessionId){
+        Session session = sessionRepository.findOne(sessionId);
         session.setEndTime(LocalDateTime.now());
         session.getGroup().setOnAir(false);
 

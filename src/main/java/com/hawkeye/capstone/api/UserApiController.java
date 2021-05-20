@@ -105,7 +105,7 @@ public class UserApiController {
                 findUser.getImageDir(), findUser.getImageDir2(), findUser.getImageDir3());
     }
 
-    //프로필 이미지 경로 불러오기
+    //프로필 이미지 base64 인코딩하여 전송
     @GetMapping("/api/image/getImage/{userId}")
     public byte[] getImage(@PathVariable("userId") Long userId) {
         User findUser = userService.findOne(userId);

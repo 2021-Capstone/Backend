@@ -127,9 +127,8 @@ public class GroupApiController {
     //수업 종료
     @PostMapping("/api/group/endSession/{sessionId}")
     public SessionDto endSession(@PathVariable("sessionId") Long sessionId) {
-        Session findSession = sessionService.findOne(sessionId);
 
-        return new SessionDto(sessionService.endSession(findSession));
+        return new SessionDto(sessionService.endSession(sessionId));
 
     }
 
