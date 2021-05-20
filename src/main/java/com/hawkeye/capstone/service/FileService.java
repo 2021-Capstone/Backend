@@ -40,13 +40,13 @@ public class FileService {
         return copyOfLocation.toString();
     }
 
-    public byte[] fileUpload(String fileName){
+    public byte[] fileUpload(String fileDir){
 
-        Path readDir = Paths.get(fileName);
+        Path readDir = Paths.get(fileDir);
 
         try{
 
-            File sourceImage = new File(fileName);
+            File sourceImage = new File(fileDir);
             byte[] bytes = new byte[(int)sourceImage.length()];
             FileInputStream fileInputStream = new FileInputStream(sourceImage);
             fileInputStream.read(bytes);

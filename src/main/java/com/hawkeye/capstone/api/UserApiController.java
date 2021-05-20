@@ -17,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
-import java.awt.image.BufferedImage;
 import java.util.List;
 
 @RestController
@@ -60,6 +59,29 @@ public class UserApiController {
 //    }
 
     //로그인 토큰
+//    @PostMapping("/api/auth/login")
+//    public LogInResponse logIn(@RequestBody @Valid LogInRequest request) {
+//
+//        User findUser = userService.findByEmail(request.getEmail());
+//
+//        if(userService.loadUserByEmail(request.getEmail(), request.getPassword())){
+//            //토큰 생성
+//            String token = jwtTokenProvider.createToken(findUser.getUsername(), findUser.getRoles());
+//
+//            List<GroupSearchDto> groupSearchDtoList = groupService.getGroupListWithRole(findUser.getId());
+//
+//            return new LogInResponse(findUser.getName(), fileService.fileUpload(findUser.getImageDir()),
+//                    findUser.getEmail(), token, findUser.getId());
+//        }
+//
+//        else{
+//            throw new IllegalStateException("로그인에 실패했습니다.");
+//        }
+//
+//    }
+
+
+    //로그인 토큰X
     @PostMapping("/api/auth/login")
     public LogInResponse logIn(@RequestBody @Valid LogInRequest request) {
 
@@ -67,7 +89,7 @@ public class UserApiController {
 
         if(userService.loadUserByEmail(request.getEmail(), request.getPassword())){
             //토큰 생성
-            String token = jwtTokenProvider.createToken(findUser.getUsername(), findUser.getRoles());
+            String token = null;
 
             List<GroupSearchDto> groupSearchDtoList = groupService.getGroupListWithRole(findUser.getId());
 
