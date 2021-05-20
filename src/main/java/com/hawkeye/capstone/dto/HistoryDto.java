@@ -16,7 +16,9 @@ public class HistoryDto {
     private GroupRole role;
     private Long historyId;
     private String groupName;
-    private LocalDateTime createdAt;
+    private int createdYear;
+    private int createdMonth;
+    private int createdDay;
     private int attendanceCount;
     private int vibe;
     private boolean isAttend;
@@ -27,13 +29,16 @@ public class HistoryDto {
 
     //GUEST 생성자
 
-    public HistoryDto(GroupRole role, Long historyId, String groupName, LocalDateTime createdAt,
-                      int attendanceCount, int vibe, boolean isAttend, List<TimeLineLog> timeLineLogList,
+    public HistoryDto(GroupRole role, Long historyId, String groupName, int createdYear,
+                      int createdMonth, int createdDay, int attendanceCount, int vibe,
+                      boolean isAttend, List<TimeLineLog> timeLineLogList,
                       RollGraph roll, YawGraph yaw) {
         this.role = role;
         this.historyId = historyId;
         this.groupName = groupName;
-        this.createdAt = createdAt;
+        this.createdYear = createdYear;
+        this.createdMonth = createdMonth;
+        this.createdDay = createdDay;
         this.attendanceCount = attendanceCount;
         this.vibe = vibe;
         this.isAttend = isAttend;
@@ -45,12 +50,14 @@ public class HistoryDto {
     //HOST 생성자
 
     public HistoryDto(GroupRole role, Long historyId, String groupName,
-                      LocalDateTime createdAt, int attendanceCount, int vibe,
+                      int createdYear, int createdMonth, int createdDay, int attendanceCount, int vibe,
                       List<HistoryGroupMemberDto> historyGroupMemberDtoList) {
         this.role = role;
         this.historyId = historyId;
         this.groupName = groupName;
-        this.createdAt = createdAt;
+        this.createdYear = createdYear;
+        this.createdMonth = createdMonth;
+        this.createdDay = createdDay;
         this.attendanceCount = attendanceCount;
         this.vibe = vibe;
         this.historyGroupMemberDtoList = historyGroupMemberDtoList;

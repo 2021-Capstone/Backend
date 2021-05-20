@@ -30,7 +30,7 @@ public class HistoryService {
     }
 
     //수업 종료 후 히스토리 생성
-    public Long createHistory(Long userId, Long sessionId, LocalDateTime createdAt,
+    public Long createHistory(Long userId, Long sessionId,
                               int attendanceCount, int attitude, int vibe, boolean isAttend,
                               List<TimeLineLog> timeLineLogList, RollGraph roll,
                               YawGraph yaw) {
@@ -41,7 +41,7 @@ public class HistoryService {
         History history = History.builder()
                 .user(findUser)
                 .session(findSession)
-                .createdAt(createdAt)
+                .createdAt(LocalDateTime.now())
                 .isAttend(isAttend)
                 .attendanceCount(attendanceCount)
                 .attitude(attitude)
@@ -90,7 +90,8 @@ public class HistoryService {
 
                 }
                 historyDtoList.add(new HistoryDto(GroupRole.HOST, history.getId(),
-                        history.getSession().getGroup().getName(), history.getCreatedAt(),
+                        history.getSession().getGroup().getName(), history.getCreatedAt().getYear(),
+                        history.getCreatedAt().getMonthValue(), history.getCreatedAt().getDayOfMonth(),
                         history.getAttendanceCount(), history.getVibe(), historyGroupMemberDtoList));
 
                 break;
@@ -99,7 +100,8 @@ public class HistoryService {
             //GUEST가 호출한 경우
             else{
                     historyDtoList.add(new HistoryDto(GroupRole.GUEST, history.getId(),
-                            history.getSession().getGroup().getName(), history.getCreatedAt(),
+                            history.getSession().getGroup().getName(), history.getCreatedAt().getYear(),
+                            history.getCreatedAt().getMonthValue(), history.getCreatedAt().getDayOfMonth(),
                             history.getAttendanceCount(), history.getVibe(), history.isAttend(),
                             timeLineLogRepository.findByHistory(history.getId()), history.getRollGraph(), history.getYawGraph()));
             }
@@ -118,6 +120,8 @@ public class HistoryService {
 
                 time += timeLineLog.getEndHour() - timeLineLog.getStartHour() * 60;
                 time += timeLineLog.getEndMinute() - timeLineLog.getStartMinute();
+                if(timeLineLog.getEndSecond() - timeLineLog.getStartSecond() >= 30)
+                    time += 1;
 
             }
 

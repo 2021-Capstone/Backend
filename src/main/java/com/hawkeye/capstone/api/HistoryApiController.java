@@ -28,7 +28,7 @@ public class HistoryApiController {
     @PostMapping("/api/history/createHistory")
     public CreateHistoryResponse createHistory(@RequestBody CreateHistoryRequest request){
 
-        Long historyId = historyService.createHistory(request.userId, request.sessionId, request.createdAt,
+        Long historyId = historyService.createHistory(request.userId, request.sessionId,
                 request.attendanceCount, request.attitude, request.vibe, request.attendance, request.timeLineLogList,
                 request.roll, request.yaw
         );
@@ -95,7 +95,6 @@ public class HistoryApiController {
 
         private Long userId;
         private Long sessionId;
-        private LocalDateTime createdAt;
         private int attendanceCount;
         private int attitude;
         private int vibe;
