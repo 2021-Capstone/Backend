@@ -42,13 +42,13 @@ public class History {
 
     private int vibe;
 
+    private boolean isAttend;
+
     @Embedded
     private RollGraph rollGraph;
 
     @Embedded
     private YawGraph yawGraph;
-
-    private boolean isAttend;
 
     public int getAbsenceTime(){
 
