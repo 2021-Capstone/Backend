@@ -30,10 +30,13 @@ import static jdk.nashorn.internal.runtime.regexp.joni.Config.log;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class FileService {
 
     private final AmazonS3Client amazonS3Client;
+
+    public FileService(AmazonS3Client amazonS3Client){
+        this.amazonS3Client = amazonS3Client;
+    }
 
     @Value("${app.upload.dir}") //yml 파일에 정의되어 있는 directory
     private String uploadDir;
