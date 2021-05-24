@@ -1,7 +1,7 @@
 spring:
   datasource:
-    url: jdbc:mariadb://localhost:3306/mydb
-#    url: capstone.cmwlrea0pvtl.ap-northeast-2.rds.amazonaws.com
+#    url: jdbc:mariadb://localhost:3306/mydb
+    url: capstone.cmwlrea0pvtl.ap-northeast-2.rds.amazonaws.com
     #username: root
     username: prince
     password: "wlgns1204"
