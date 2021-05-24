@@ -27,8 +27,6 @@ import java.nio.Buffer;
 import java.nio.file.*;
 import java.util.UUID;
 
-import static jdk.nashorn.internal.runtime.regexp.joni.Config.log;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -42,6 +40,9 @@ public class FileService {
 
     @Value("${aws.s3.image.bucket")
     private String bucket;
+
+    @Value("${aws.s3.image.bucket.url")
+    private String bucketUrl;
 
     //로컬 파일에 업로드
 //    public String fileUpload(MultipartFile multipartFile){
@@ -77,7 +78,7 @@ public class FileService {
             //S3파일 업로드
             uploadOnS3(saveFileName, file);
             //주소 할당
-            url = bucket + "/" + saveFileName;
+            url = bucketUrl + saveFileName;
             //파일 삭제
             file.delete();
         } catch (StringIndexOutOfBoundsException e) {
@@ -113,8 +114,8 @@ public class FileService {
         return UUID.randomUUID().toString().replaceAll("-", "");
     }
 
-    private void uploadOnS3(final String findName, final File file) {
-        String fileName = bucket + "/" + findName;
+    private void uploadOnS3(final String fileName, final File file) {
+
         amazonS3.putObject(new PutObjectRequest(bucket, fileName, file)
                 .withCannedAcl(CannedAccessControlList.PublicRead));
 //        //AWS S3 전송 객체 생성
