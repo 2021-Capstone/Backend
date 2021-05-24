@@ -38,10 +38,11 @@ aws:
   s3:
     image:
 #      bucket: https://capstone-image.s3-ap-northeast-2.amazonaws.com/
-      bucket: https://s3.ap-northeast-2.amazonaws.com/capstone-image
+#      bucket: https://s3.ap-northeast-2.amazonaws.com/capstone-image/
+      bucket: capstone-image
 
 app:
   upload:
 #    dir: C:\Users\KJH\Documents\Capstone\Backend-master\image
-#    dir: D:\Capstone\Image\
-    dir: https://capstone-image.s3-ap-northeast-2.amazonaws.com/
+    dir: D:\Capstone\Image\
+#    dir: https://capstone-image.s3-ap-northeast-2.amazonaws.com/
