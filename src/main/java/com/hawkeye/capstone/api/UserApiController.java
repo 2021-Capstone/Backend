@@ -36,8 +36,8 @@ public class UserApiController {
                                              @RequestParam("file1") MultipartFile file1, @RequestParam("file2") MultipartFile file2,
                                              @RequestParam("file3") MultipartFile file3){
 
-        UserDto userDto = new UserDto(email, name, fileService.fileDownLoad(file1),
-                fileService.fileDownLoad(file2), fileService.fileDownLoad(file3), password);
+        UserDto userDto = new UserDto(email, name, fileService.fileUpload(file1),
+                fileService.fileUpload(file2), fileService.fileUpload(file3), password);
 
         Long id = userService.join(userDto, passwordConfirm);
 
@@ -93,7 +93,7 @@ public class UserApiController {
 
             List<GroupSearchDto> groupSearchDtoList = groupService.getGroupListWithRole(findUser.getId());
 
-            return new LogInResponse(findUser.getName(), fileService.fileUpload(findUser.getImageDir()),
+            return new LogInResponse(findUser.getName(), fileService.fileDownload(findUser.getImageDir()),
                     findUser.getEmail(), token, findUser.getId());
         }
 
@@ -120,8 +120,8 @@ public class UserApiController {
                                          @RequestParam("name") String name, @RequestParam("file1") MultipartFile file1,
                                          @RequestParam("file2") MultipartFile file2, @RequestParam("file3") MultipartFile file3) {
 
-        userService.update(userId, email, name, fileService.fileDownLoad(file1),
-                fileService.fileDownLoad(file2), fileService.fileDownLoad(file3));
+        userService.update(userId, email, name, fileService.fileUpload(file1),
+                fileService.fileUpload(file2), fileService.fileUpload(file3));
         User findUser = userService.findOne(userId);
         return new UserSearchDto(findUser.getEmail(), findUser.getName(),
                 findUser.getImageDir(), findUser.getImageDir2(), findUser.getImageDir3());
@@ -132,7 +132,7 @@ public class UserApiController {
     public byte[] getImage(@PathVariable("userId") Long userId) {
         User findUser = userService.findOne(userId);
 
-        return fileService.fileUpload(findUser.getImageDir());
+        return fileService.fileDownload(findUser.getImageDir());
     }
 
     @Data

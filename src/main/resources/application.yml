@@ -27,6 +27,18 @@ logging.level:
   org.hibernate.SQL: debug
   org.hibernate.type: trace
 
+cloud:
+  aws:
+    stack.auto: false
+    region.static: ap-northeast-2
+    credentials:
+      access-key: AKIAS2BFGUMTTWUS47UP
+      secret-key: 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
+aws:
+  s3:
+    image:
+      bucket: https://capstone-image.s3-ap-northeast-2.amazonaws.com/
+
 app:
   upload:
 #    dir: C:\Users\KJH\Documents\Capstone\Backend-master\image
