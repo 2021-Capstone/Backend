@@ -3,6 +3,7 @@ package com.hawkeye.capstone.service;
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
@@ -30,13 +31,11 @@ import static jdk.nashorn.internal.runtime.regexp.joni.Config.log;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class FileService {
 
-    private final AmazonS3Client amazonS3Client;
+    private final AmazonS3 amazonS3;
 
-    public FileService(AmazonS3Client amazonS3Client){
-        this.amazonS3Client = amazonS3Client;
-    }
 
     @Value("${app.upload.dir}") //yml 파일에 정의되어 있는 directory
     private String uploadDir;
@@ -63,10 +62,10 @@ public class FileService {
 //    }
 
     //s3에 업로드
-    public String fileUpload(MultipartFile multipartFile){
+    public String fileUpload(MultipartFile multipartFile) {
         String originName = multipartFile.getOriginalFilename();
         String url = null;
-        try{
+        try {
             //확장자 찾기
             final String ext = originName.substring(originName.lastIndexOf('.'));
             //파일이름 암호화
@@ -78,26 +77,26 @@ public class FileService {
             //S3파일 업로드
             uploadOnS3(saveFileName, file);
             //주소 할당
-            url = bucket + saveFileName;
+            url = bucket + "/" + saveFileName;
             //파일 삭제
             file.delete();
-        }catch (StringIndexOutOfBoundsException e){
+        } catch (StringIndexOutOfBoundsException e) {
             url = null;
-        }catch (IOException e){
+        } catch (IOException e) {
             log.error("IOException");
         }
         return url;
     }
 
     //업로드한 이미지 꺼내오기
-    public byte[] fileDownload(String fileDir){
+    public byte[] fileDownload(String fileDir) {
 
         Path readDir = Paths.get(fileDir);
 
-        try{
+        try {
 
             File sourceImage = new File(fileDir);
-            byte[] bytes = new byte[(int)sourceImage.length()];
+            byte[] bytes = new byte[(int) sourceImage.length()];
             FileInputStream fileInputStream = new FileInputStream(sourceImage);
             fileInputStream.read(bytes);
 
@@ -105,30 +104,33 @@ public class FileService {
 
             return Base64.encodeBase64(bytes);
 
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new IllegalStateException("이미지 불러오기 실패");
         }
     }
 
-    private static String getUuid(){
+    private static String getUuid() {
         return UUID.randomUUID().toString().replaceAll("-", "");
     }
 
-    private void uploadOnS3(final String findName, final File file){
-        //AWS S3 전송 객체 생성
-        @Deprecated
-        final TransferManager transferManager = new TransferManager(this.amazonS3Client);
-        //요청 객체 생성
-        final PutObjectRequest request = new PutObjectRequest(bucket, findName, file);
-        //업로드 시도
-        final Upload upload = transferManager.upload(request);
-
-        try{
-            upload.waitForCompletion();
-        }catch (AmazonClientException amazonClientException){
-            log.error(amazonClientException.getMessage());
-        }catch (InterruptedException e){
-            log.error(e.getMessage());
-        }
+    private void uploadOnS3(final String findName, final File file) {
+        String fileName = bucket + "/" + findName;
+        amazonS3.putObject(new PutObjectRequest(bucket, fileName, file)
+                .withCannedAcl(CannedAccessControlList.PublicRead));
+//        //AWS S3 전송 객체 생성
+//        @Deprecated
+//        final TransferManager transferManager = new TransferManager(this.amazonS3Client);
+//        //요청 객체 생성
+//        final PutObjectRequest request = new PutObjectRequest(bucket, findName, file);
+//        //업로드 시도
+//        final Upload upload = transferManager.upload(request);
+//
+//        try{
+//            upload.waitForCompletion();
+//        }catch (AmazonClientException amazonClientException){
+//            log.error(amazonClientException.getMessage());
+//        }catch (InterruptedException e){
+//            log.error(e.getMessage());
+//        }
     }
 }
