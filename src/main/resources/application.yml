@@ -17,7 +17,7 @@ spring:
     generate-ddl: true
     show-sql: true
     hibernate:
-      ddl-auto: create
+      ddl-auto: none
     #properties:
       hibernate:
 #        show_sql: true
@@ -37,7 +37,8 @@ cloud:
 aws:
   s3:
     image:
-      bucket: https://capstone-image.s3-ap-northeast-2.amazonaws.com/
+#      bucket: https://capstone-image.s3-ap-northeast-2.amazonaws.com/
+      bucket: https://s3.ap-northeast-2.amazonaws.com/capstone-image
 
 app:
   upload:
