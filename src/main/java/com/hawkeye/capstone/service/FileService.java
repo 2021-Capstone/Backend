@@ -41,7 +41,7 @@ public class FileService {
     @Value("${aws.s3.image.bucket")
     private String bucket;
 
-    @Value("${aws.s3.image.bucket.url")
+    @Value("${aws.s3.image.url")
     private String bucketUrl;
 
     //로컬 파일에 업로드
