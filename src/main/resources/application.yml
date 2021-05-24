@@ -30,4 +30,5 @@ logging.level:
 app:
   upload:
 #    dir: C:\Users\KJH\Documents\Capstone\Backend-master\image
-    dir: D:\Capstone\Image\
+#    dir: D:\Capstone\Image\
+    dir: https://capstone-image.s3-ap-northeast-2.amazonaws.com/
