@@ -26,24 +26,24 @@ public class UserRepositoryTest {
     EntityManager em;
 
 
-    @Test
-    public void 이름으로_회원찾기() throws Exception{
-        //given
-        User user = new User();
-        user.setName("kim");
-        //when
-        userRepository.save(user);
-        //then
-        assertEquals(user.getName(), (userRepository.findByName("kim")).get(0).getName());
-    }
-
-    @Test
-    @Rollback(value = false)
-    public void 비밀번호_저장() throws Exception{
-        //given
-        User user = new User();
-        user.setPassword("123");
-        //when
-        userRepository.save(user);
-    }
+//    @Test
+//    public void 이름으로_회원찾기() throws Exception{
+//        //given
+//        User user = new User();
+//        user.setName("kim");
+//        //when
+//        userRepository.save(user);
+//        //then
+//        assertEquals(user.getName(), (userRepository.findByName("kim")).get(0).getName());
+//    }
+//
+//    @Test
+//    @Rollback(value = false)
+//    public void 비밀번호_저장() throws Exception{
+//        //given
+//        User user = new User();
+//        user.setPassword("123");
+//        //when
+//        userRepository.save(user);
+//    }
 }

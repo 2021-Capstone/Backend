@@ -50,21 +50,4 @@ public class History {
     @Embedded
     private YawGraph yawGraph;
 
-    public int getAbsenceTime(){
-
-        int time = 0;
-
-        for(TimeLineLog timeLineLog : timeLineLogList){
-
-            if(timeLineLog.getState() == "absence"){
-
-                time += timeLineLog.getEndHour() - timeLineLog.getStartHour() * 60;
-                time += timeLineLog.getEndMinute() - timeLineLog.getStartMinute();
-
-            }
-
-        }
-
-        return time;
-    }
 }

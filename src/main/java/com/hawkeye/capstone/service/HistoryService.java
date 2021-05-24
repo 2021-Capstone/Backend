@@ -151,7 +151,7 @@ public class HistoryService {
         for (History history : findHistoryList) {
             hostHistoryDtoList.add(new HostHistoryDto(
                     history.getId(), history.getUser().getName(), history.getUser().getEmail(),
-                    history.getVibe(), history.getAbsenceTime(), history.isAttend()));
+                    history.getVibe(), getAbsenceTime(history.getId()), history.isAttend()));
         }
 
         return hostHistoryDtoList;
