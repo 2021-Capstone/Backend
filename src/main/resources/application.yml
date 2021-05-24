@@ -1,9 +1,11 @@
 spring:
-#  datasource:
+  datasource:
+    url: jdbc:mariadb://capstone.cmwlrea0pvtl.ap-northeast-2.rds.amazonaws.com:3306/mydb
 #    url: jdbc:mariadb://localhost:3306/mydb
     #username: root
-#    password: "wlgns1204"
-#    driver-class-name: org.mariadb.jdbc.Driver
+    username: prince
+    password: wlgns1204
+    driver-class-name: org.mariadb.jdbc.Driver
 #    url: jdbc:h2:tcp://localhost/~/capstone
 #    username: sa
 #    password:
