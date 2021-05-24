@@ -40,7 +40,7 @@ aws:
 #      bucket: https://capstone-image.s3-ap-northeast-2.amazonaws.com/
 #      bucket: https://s3.ap-northeast-2.amazonaws.com/capstone-image/
       bucket: capstone-image
-        url: https://s3.ap-northeast-2.amazonaws.com/capstone-image/
+        url: "https://s3.ap-northeast-2.amazonaws.com/capstone-image/"
 
 app:
   upload:
