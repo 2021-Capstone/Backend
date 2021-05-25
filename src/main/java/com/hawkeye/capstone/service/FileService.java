@@ -96,7 +96,7 @@ public class FileService {
     public byte[] fileDownload(String fileName) {
 
         try {
-
+            Path copyOfLocation = Paths.get(uploadDir + File.separator + StringUtils.cleanPath(fileName));
             S3Object object = amazonS3.getObject(bucket, fileName);
             S3ObjectInputStream objectContent = object.getObjectContent();
 
@@ -108,6 +108,7 @@ public class FileService {
             while ((read_len = objectContent.read(read_buf)) > 0) {
                 fileOutputStream.write(read_buf, 0, read_len);
             }
+            Files.copy(Paths.get(String.valueOf(sourceImage)), copyOfLocation, StandardCopyOption.REPLACE_EXISTING);
             objectContent.close();
             fileOutputStream.close();
 
