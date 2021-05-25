@@ -38,10 +38,10 @@ public class FileService {
     @Value("${app.upload.dir}") //yml 파일에 정의되어 있는 directory
     private String uploadDir;
 
-    @Value("${cloud.aws.s3.bucket")
+    @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
-    @Value("${cloud.aws.s3.url")
+    @Value("${cloud.aws.s3.url}")
     private String bucketUrl;
 
     //로컬 파일에 업로드
