@@ -97,51 +97,16 @@ public class FileService {
         return null;
     }
 
-//    //업로드한 이미지 꺼내오기
-//    public byte[] fileDownload(String fileName) {
-//
-//        try {
-//
-//            S3Object object = amazonS3.getObject(bucket, fileName);
-//            S3ObjectInputStream objectContent = object.getObjectContent();
-//
-//
-//            byte[] bytes = toByteArray(objectContent);
-//            Resource resource = new ByteArrayResource(bytes);
-////            File sourceImage = new File(fileName);
-////            FileOutputStream fileOutputStream = new FileOutputStream(sourceImage);
-////
-////            byte[] read_buf = new byte[1024];
-////            int read_len = 0;
-////            while ((read_len = objectContent.read(read_buf)) >= 0) {
-////                fileOutputStream.write(read_buf, 0, read_len);
-////            }
-//
-//            objectContent.close();
-////            fileOutputStream.close();
-//
-//            return Base64.encodeBase64(bytes);
-//
-//        } catch (AmazonServiceException e) {
-//            log.error("AmazonServiceException");
-//        } catch (FileNotFoundException e) {
-//            log.error("FileNotFoundException");
-//        } catch (IOException e) {
-//            throw new IllegalStateException("IOException");
-//        }
-//        return null;
-//    }
     //업로드한 이미지 꺼내오기
-    public Resource fileDownload(String fileName) {
+    public byte[] fileDownload(String fileName) {
 
         try {
 
             S3Object object = amazonS3.getObject(bucket, fileName);
+
             S3ObjectInputStream objectContent = object.getObjectContent();
 
-
             byte[] bytes = toByteArray(objectContent);
-            Resource resource = new ByteArrayResource(bytes);
 //            File sourceImage = new File(fileName);
 //            FileOutputStream fileOutputStream = new FileOutputStream(sourceImage);
 //
@@ -154,8 +119,7 @@ public class FileService {
             objectContent.close();
 //            fileOutputStream.close();
 
-            return resource;
-//            return Base64.encodeBase64(bytes);
+            return Base64.encodeBase64(bytes);
 
         } catch (AmazonServiceException e) {
             log.error("AmazonServiceException");
@@ -166,6 +130,7 @@ public class FileService {
         }
         return null;
     }
+
 
     private byte[] fileToByte(File file){
         try {
