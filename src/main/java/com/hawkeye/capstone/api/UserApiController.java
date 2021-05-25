@@ -12,6 +12,7 @@ import com.hawkeye.capstone.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -129,7 +130,7 @@ public class UserApiController {
 
     //프로필 이미지 base64 인코딩하여 전송
     @GetMapping("/api/image/getImage/{userId}")
-    public byte[] getImage(@PathVariable("userId") Long userId) {
+    public Resource getImage(@PathVariable("userId") Long userId) {
         User findUser = userService.findOne(userId);
 
         return fileService.fileDownload(findUser.getImageDir());
@@ -139,7 +140,7 @@ public class UserApiController {
     @AllArgsConstructor
     static class LogInResponse {
         private String name;
-        private byte[] profileImage;
+        private Resource profileImage;
         private String email;
         private String token;
         private Long userId;
