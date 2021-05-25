@@ -67,6 +67,7 @@ public class FileService {
         String originName = multipartFile.getOriginalFilename();
         String url = null;
         try {
+            System.out.println("bucket = " + bucket);
             //확장자 찾기
             final String ext = originName.substring(originName.lastIndexOf('.'));
             //파일이름 암호화
