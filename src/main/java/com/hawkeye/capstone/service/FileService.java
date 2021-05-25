@@ -112,7 +112,7 @@ public class FileService {
             objectContent.close();
             fileOutputStream.close();
 
-            return Base64.encodeBase64(read_buf);
+            return Base64.encodeBase64(fileToByte(sourceImage));
 
         } catch (AmazonServiceException e) {
             log.error("AmazonServiceException");
