@@ -29,8 +29,10 @@ logging.level:
 
 cloud:
   aws:
-    stack.auto: false
-    region.static: ap-northeast-2
+    stack:
+      auto: false
+    region:
+      static: ap-northeast-2
     credentials:
       access-key: AKIAS2BFGUMTTWUS47UP
       secret-key: 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
