@@ -1,10 +1,13 @@
 package com.hawkeye.capstone.service;
 
 import com.amazonaws.AmazonClientException;
+import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
 import com.amazonaws.services.s3.transfer.Upload;
@@ -12,6 +15,7 @@ import com.hawkeye.capstone.base64.BASE64DecodedMultipartFile;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.codec.binary.Base64;
+import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -20,9 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.Buffer;
 import java.nio.file.*;
 import java.util.UUID;
@@ -65,13 +67,12 @@ public class FileService {
     //s3에 업로드
     public String fileUpload(MultipartFile multipartFile) {
         String originName = multipartFile.getOriginalFilename();
-        String url = null;
+//        String url = null;
         try {
-            System.out.println("bucket = " + bucket);
             //확장자 찾기
             final String ext = originName.substring(originName.lastIndexOf('.'));
             //파일이름 암호화
-            final String saveFileName = getUuid() + ext;
+            String saveFileName = getUuid() + ext;
             //파일 객체 생성 (user.dir = 현재 작업 디렉토리)
             File file = new File(System.getProperty("user.dir") + saveFileName);
             //파일 변환
@@ -79,37 +80,65 @@ public class FileService {
             //S3파일 업로드
             uploadOnS3(saveFileName, file);
             //주소 할당
-            url = bucketUrl + saveFileName;
+//            url = bucketUrl + saveFileName;
             //파일 삭제
             file.delete();
+            return saveFileName;
         } catch (StringIndexOutOfBoundsException e) {
-            url = null;
+            log.error("StringIndexOutOfBoundsException");
         } catch (IOException e) {
             log.error("IOException");
         }
-        return url;
+        return null;
     }
 
     //업로드한 이미지 꺼내오기
-    public byte[] fileDownload(String fileDir) {
-
-        Path readDir = Paths.get(fileDir);
+    public byte[] fileDownload(String fileName) {
 
         try {
 
-            File sourceImage = new File(fileDir);
-            byte[] bytes = new byte[(int) sourceImage.length()];
-            FileInputStream fileInputStream = new FileInputStream(sourceImage);
-            fileInputStream.read(bytes);
+            S3Object object = amazonS3.getObject(bucket, fileName);
+            S3ObjectInputStream objectContent = object.getObjectContent();
+            FileOutputStream fileOutputStream = new FileOutputStream(new File(fileName));
+            byte[] read_buf = new byte[objectContent.read()];
+            int read_len = 0;
+            while ((read_len = objectContent.read(read_buf)) > 0) {
+                fileOutputStream.write(read_buf, 0, read_len);
+            }
+            objectContent.close();
+            fileOutputStream.close();
 
-            fileInputStream.close();
+            return Base64.encodeBase64(read_buf);
 
-            return Base64.encodeBase64(bytes);
-
-        } catch (Exception e) {
-            throw new IllegalStateException("이미지 불러오기 실패");
+        } catch (AmazonServiceException e) {
+            log.error("AmazonServiceException");
+        } catch (FileNotFoundException e) {
+            log.error("FileNotFoundException");
+        } catch (IOException e) {
+            throw new IllegalStateException("IOException");
         }
+        return null;
     }
+
+    //로컬 파일에 업로드한 이미지 꺼내오기
+//    public byte[] fileDownload(String fileName) {
+//
+//        Path readDir = Paths.get(fileName);
+//
+//        try {
+//            File sourceImage = new File(fileName);
+//            byte[] bytes = new byte[(int) sourceImage.length()];
+//            FileInputStream fileInputStream = new FileInputStream(sourceImage);
+//            fileInputStream.read(bytes);
+//
+//            fileInputStream.close();
+//
+//            return Base64.encodeBase64(bytes);
+//
+//        } catch (Exception e) {
+//            throw new IllegalStateException("이미지 불러오기 실패");
+//        }
+//    }
 
     private static String getUuid() {
         return UUID.randomUUID().toString().replaceAll("-", "");
