@@ -105,7 +105,7 @@ public class FileService {
 
             byte[] read_buf = new byte[1024];
             int read_len = 0;
-            while ((read_len = objectContent.read(read_buf)) > 0) {
+            while ((read_len = objectContent.read(read_buf)) >= 0) {
                 fileOutputStream.write(read_buf, 0, read_len);
             }
 
