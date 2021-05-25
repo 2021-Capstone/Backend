@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -28,6 +29,8 @@ import java.io.*;
 import java.nio.Buffer;
 import java.nio.file.*;
 import java.util.UUID;
+
+import static com.amazonaws.util.IOUtils.*;
 
 @Slf4j
 @Service
@@ -100,19 +103,21 @@ public class FileService {
             S3Object object = amazonS3.getObject(bucket, fileName);
             S3ObjectInputStream objectContent = object.getObjectContent();
 
-            File sourceImage = new File(fileName);
-            FileOutputStream fileOutputStream = new FileOutputStream(sourceImage);
 
-            byte[] read_buf = new byte[10240];
-            int read_len = 0;
-            while ((read_len = objectContent.read(read_buf)) >= 0) {
-                fileOutputStream.write(read_buf, 0, read_len);
-            }
+            byte[] bytes = toByteArray(objectContent);
+//            File sourceImage = new File(fileName);
+//            FileOutputStream fileOutputStream = new FileOutputStream(sourceImage);
+//
+//            byte[] read_buf = new byte[1024];
+//            int read_len = 0;
+//            while ((read_len = objectContent.read(read_buf)) >= 0) {
+//                fileOutputStream.write(read_buf, 0, read_len);
+//            }
 
             objectContent.close();
-            fileOutputStream.close();
+//            fileOutputStream.close();
 
-            return Base64.encodeBase64(fileToByte(sourceImage));
+            return Base64.encodeBase64(bytes);
 
         } catch (AmazonServiceException e) {
             log.error("AmazonServiceException");
