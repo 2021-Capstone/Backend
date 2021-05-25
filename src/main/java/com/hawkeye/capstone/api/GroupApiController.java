@@ -7,6 +7,7 @@ import com.hawkeye.capstone.service.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -78,6 +79,7 @@ public class GroupApiController {
 
     //그룹 탈퇴
     @PostMapping("/api/group/exitGroup/{groupId}")
+    @Transactional//임시 -> 해결해야함
     public ExitGroupResponse exitGroup(@PathVariable("groupId") Long groupId, @RequestBody ExitGroupRequest request) {
 
         //유저가 속한 Queue 전부 조회
