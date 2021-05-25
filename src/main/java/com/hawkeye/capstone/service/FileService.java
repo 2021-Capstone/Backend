@@ -103,10 +103,13 @@ public class FileService {
             File sourceImage = new File(fileName);
             FileOutputStream fileOutputStream = new FileOutputStream(sourceImage);
 
-            byte[] bytes = new byte[1024];
-            int read_len = 0;
-            while ((read_len = objectContent.read(bytes)) > 0) {
-                fileOutputStream.write(bytes, 0, read_len);
+            byte[] read_buf = new byte[1024];
+//            int read_len = 0;
+//            while ((read_len = objectContent.read(read_buf)) > 0) {
+//                fileOutputStream.write(read_buf, 0, read_len);
+//            }
+            if (objectContent.read(read_buf) > 0) {
+                fileOutputStream.write(read_buf);
             }
             objectContent.close();
             fileOutputStream.close();
