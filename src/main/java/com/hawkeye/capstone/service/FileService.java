@@ -100,7 +100,7 @@ public class FileService {
             S3Object object = amazonS3.getObject(bucket, fileName);
             S3ObjectInputStream objectContent = object.getObjectContent();
             FileOutputStream fileOutputStream = new FileOutputStream(new File(fileName));
-            byte[] read_buf = new byte[1024];
+            byte[] read_buf = new byte[1024000];
             int read_len = 0;
             while ((read_len = objectContent.read(read_buf)) > 0) {
                 fileOutputStream.write(read_buf, 0, read_len);
