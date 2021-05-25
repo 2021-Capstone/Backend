@@ -208,5 +208,17 @@ public class GroupService {
         return groupSearchDtoList;
     }
 
+    //그룹 탈퇴
+    @Transactional
+    public void exitGroup(Long groupId, Long userId){
+        //유저가 속한 Queue 전부 조회
+        List<Queue> queueList = queueRepository.findByUser(userId);
+        for (Queue queue : queueList) {
+            if (queue.getWaitingList().getGroup().getId() == groupId) {
+                //status EXIT으로 변경
+                queueRepository.setStatus(queue, WaitingStatus.EXIT);
+            }
+        }
+    }
 }
 
