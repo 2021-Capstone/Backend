@@ -14,7 +14,7 @@ public class TimeLineLog {
     @Id
     @GeneratedValue
     @Column(name = "time_line_log_id")
-    private int id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "history_id")
@@ -40,5 +40,8 @@ public class TimeLineLog {
 
     @Column(name = "log_end_second")
     private int endSecond;
+
+    @JsonIgnore
+    private boolean end;
 
 }

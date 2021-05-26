@@ -153,6 +153,17 @@ public class GroupService {
         }
     }
 
+    //그룹 멤버 수 조회
+    public int getGroupMemberCount(Long groupId){
+        int count = 0;
+        List<Queue> queueList = queueRepository.findByGroupWithUser(groupId);
+        for (Queue queue : queueList) {
+            if(queue.getStatus() == WaitingStatus.ACCEPT)
+                count++;
+        }
+        return count;
+    }
+
     //그룹 멤버 조회
     public GroupMemberDto getGroupMember(Long groupId) {
         List<Queue> findQueueList = new ArrayList<>();

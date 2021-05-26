@@ -1,8 +1,6 @@
 package com.hawkeye.capstone.api;
 
-import com.hawkeye.capstone.domain.PitchGraph;
-import com.hawkeye.capstone.domain.TimeLineLog;
-import com.hawkeye.capstone.domain.YawGraph;
+import com.hawkeye.capstone.domain.*;
 import com.hawkeye.capstone.dto.HistoryDto;
 import com.hawkeye.capstone.repository.HistoryRepository;
 import com.hawkeye.capstone.service.HistoryService;
@@ -54,6 +52,16 @@ public class HistoryApiController {
             return new CreateHistoryResponse(historyId, false);
         else
             return new CreateHistoryResponse(historyId, true);
+    }
+
+    //수업 분위기
+    @GetMapping("/api/history/getVibe/{sessionId}")
+    public int getVibe(@PathVariable Long sessionId){
+
+        Session findSession = sessionService.findOne(sessionId);
+        List<History> historyList = findSession.getHistoryList();
+
+        return historyList.get(0).getVibe();
     }
 
     //히스토리 한 번에 전송

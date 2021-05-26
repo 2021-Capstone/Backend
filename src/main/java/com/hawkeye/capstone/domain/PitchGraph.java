@@ -17,9 +17,9 @@ public class PitchGraph {
     public PitchGraph() {
     }
 
-    public PitchGraph(int left, int normal, int right) {
-        this.pitchUp = left;
+    public PitchGraph(int up, int normal, int down) {
+        this.pitchUp = up;
         this.pitchNormal = normal;
-        this.pitchDown = right;
+        this.pitchDown = down;
     }
 }

@@ -52,7 +52,6 @@ public class HistoryRepository {
     public History findOneGuestInSession(Long userId, Long sessionId){
 
         User findUser = userRepository.findOne(userId);
-        Session findSession = sessionRepository.findOne(sessionId);
 
         List<History> historyList = findUser.getHistoryList();
         for (History history : historyList) {

@@ -20,6 +20,10 @@ public class TimeLineLogRepository {
         em.persist(timeLineLog);
     }
 
+    public TimeLineLog findOne(Long timeLineLogId){
+        return em.find(TimeLineLog.class, timeLineLogId);
+    }
+
     public List<TimeLineLog> findByHistory(Long historyId){
 
         return em.createQuery("select t from TimeLineLog t " +

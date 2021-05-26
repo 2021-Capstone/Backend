@@ -14,6 +14,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -23,6 +24,7 @@ public class HistoryService {
     private final SessionRepository sessionRepository;
     private final UserRepository userRepository;
     private final TimeLineLogRepository timeLineLogRepository;
+    private final GroupService groupService;
 
     public History findOne(Long historyId) {
         return historyRepository.findOne(historyId);
@@ -30,14 +32,52 @@ public class HistoryService {
 
     //히스토리 생성 알고리즘
     public Long createRequest(Long userId, Long sessionId, int pitch, int yaw, boolean absence) {
-        return null;
+        History findHistory = historyRepository.findOneGuestInSession(userId, sessionId);
+
+        PitchGraph pitchGraph = calculatePitch(pitch);
+        YawGraph yawGraph = calculateYaw(yaw);
+        int attitude = calculateAttitude(pitch);
+
+        //자리를 비운 경우
+        if (absence) {
+            //새로운 TimeLineLog 생성
+            if (findHistory.getTimeLineLogList().isEmpty() ||
+                    findHistory.getTimeLineLogList().get(findHistory.getTimeLineLogList().size() - 1).isEnd() == true){
+
+                TimeLineLog timeLineLog = new TimeLineLog();
+                LocalDateTime startTime = LocalDateTime.now();
+                timeLineLog.setStartHour(startTime.getHour());
+                timeLineLog.setStartMinute(startTime.getMinute());
+                timeLineLog.setStartSecond(startTime.getSecond());
+                timeLineLog.setState("absence");
+                timeLineLogRepository.save(timeLineLog);
+
+                return createOrUpdateHistory(userId, sessionId, attitude, absence, timeLineLog, pitchGraph, yawGraph);
+            }
+
+        }
+
+        //자리를 비우지 않은 경우
+        else{
+            //자리를 비웠다가 돌아온 경우
+            if(findHistory.getTimeLineLogList().get(findHistory.getTimeLineLogList().size() - 1).isEnd() == false){
+                Long timeLineLogId = findHistory.getTimeLineLogList().get(findHistory.getTimeLineLogList().size() - 1).getId();
+                //변경 감지
+                TimeLineLog findTimeLineLog = timeLineLogRepository.findOne(timeLineLogId);
+                LocalDateTime endTime = LocalDateTime.now();
+                findTimeLineLog.setEndHour(endTime.getHour());
+                findTimeLineLog.setEndMinute(endTime.getMinute());
+                findTimeLineLog.setEndSecond(endTime.getSecond());
+                findTimeLineLog.setEnd(true);
+            }
+
+        }
+        return createOrUpdateHistory(userId, sessionId, attitude, absence, null, pitchGraph, yawGraph);
     }
 
     //히스토리 생성 및 변경
-    public Long createOrUpdateHistory(Long userId, Long sessionId,
-                                      int attendanceCount, int attitude, int vibe, boolean isAttend,
-                                      List<TimeLineLog> timeLineLogList, PitchGraph roll,
-                                      YawGraph yaw) {
+    public Long createOrUpdateHistory(Long userId, Long sessionId, int attitude, boolean absence,
+                                      TimeLineLog timeLineLog, PitchGraph pitch, YawGraph yaw) {
 
         User findUser = userRepository.findOne(userId);
         Session findSession = sessionRepository.findOne(sessionId);
@@ -46,16 +86,20 @@ public class HistoryService {
         if (findUser.getHistoryList().isEmpty() ||
                 findUser.getHistoryList().get(findUser.getHistoryList().size() - 1).getSession().getId() != sessionId) {
 
+            List<TimeLineLog> timeLineLogList = new ArrayList<>();
+            if(timeLineLog != null)
+                timeLineLogList.add(timeLineLog);
+
             History history = History.builder()
                     .user(findUser)
                     .session(findSession)
                     .createdAt(LocalDateTime.now())
-                    .isAttend(isAttend)
-                    .attendanceCount(attendanceCount)
+                    .isAttend(absence)
+                    .attendanceCount(groupService.getGroupMemberCount(findSession.getGroup().getId()))
                     .attitude(attitude)
-                    .vibe(vibe)
+                    .vibe(3)
                     .timeLineLogList(timeLineLogList)
-                    .pitchGraph(roll)
+                    .pitchGraph(pitch)
                     .yawGraph(yaw)
                     .build();
 
@@ -63,9 +107,10 @@ public class HistoryService {
             historyRepository.save(history);
             findUser.getHistoryList().add(history);
 
-            for (TimeLineLog timeLineLog : timeLineLogList) {
-                timeLineLog.setHistory(history);
-                timeLineLogRepository.save(timeLineLog);
+            if(timeLineLog != null){
+                //변경 감지
+                TimeLineLog findTimeLineLog = timeLineLogRepository.findOne(timeLineLog.getId());
+                findTimeLineLog.setHistory(history);
             }
 
             return history.getId();
@@ -85,16 +130,16 @@ public class HistoryService {
             int newAttitude = (int) ((findHistory.getAttitude() * startToLastSeconds
                     + attitude * lastToNewSeconds) / (startToLastSeconds + lastToNewSeconds));
 
-            int newVibe = (int) ((findHistory.getVibe() * startToLastSeconds
-                    + vibe * lastToNewSeconds) / (startToLastSeconds + lastToNewSeconds));
+//            int newVibe = (int) ((findHistory.getVibe() * startToLastSeconds
+//                    + vibe * lastToNewSeconds) / (startToLastSeconds + lastToNewSeconds));
 
             PitchGraph newPitchGraph = new PitchGraph(
                     (int) ((findHistory.getPitchGraph().getPitchUp() * startToLastSeconds
-                            + roll.getPitchUp() * lastToNewSeconds) / (startToLastSeconds + lastToNewSeconds)),
+                            + pitch.getPitchUp() * lastToNewSeconds) / (startToLastSeconds + lastToNewSeconds)),
                     (int) ((findHistory.getPitchGraph().getPitchNormal() * startToLastSeconds
-                            + roll.getPitchNormal() * lastToNewSeconds) / (startToLastSeconds + lastToNewSeconds)),
+                            + pitch.getPitchNormal() * lastToNewSeconds) / (startToLastSeconds + lastToNewSeconds)),
                     (int) ((findHistory.getPitchGraph().getPitchDown() * startToLastSeconds
-                            + roll.getPitchDown() * lastToNewSeconds) / (startToLastSeconds + lastToNewSeconds))
+                            + pitch.getPitchDown() * lastToNewSeconds) / (startToLastSeconds + lastToNewSeconds))
             );
 
             YawGraph newYawGraph = new YawGraph(
@@ -106,13 +151,12 @@ public class HistoryService {
                             + yaw.getYawRight() * lastToNewSeconds) / (startToLastSeconds + lastToNewSeconds))
             );
 
-            List<TimeLineLog> newTimeLineLogList = new ArrayList<>();
-            timeLineLogList.addAll(findHistory.getTimeLineLogList());
-            timeLineLogList.addAll(timeLineLogList);
 
-            for (TimeLineLog timeLineLog : timeLineLogList) {
+            List<TimeLineLog> newTimeLineLogList = findHistory.getTimeLineLogList();
+
+            if(timeLineLog != null){
                 timeLineLog.setHistory(findHistory);
-                timeLineLogRepository.save(timeLineLog);
+                newTimeLineLogList.add(timeLineLog);
             }
 
             findHistory.setAttitude(newAttitude);
@@ -120,12 +164,13 @@ public class HistoryService {
             findHistory.setPitchGraph(newPitchGraph);
             findHistory.setYawGraph(newYawGraph);
             findHistory.setTimeLineLogList(newTimeLineLogList);
+            findHistory.setAttendanceCount(calculateAttendance(sessionId));
+            findHistory.setVibe(calculateVibe(sessionId));
 
             return findHistory.getId();
         }
 
     }
-
 
 
     //히스토리 전체 열람
@@ -224,7 +269,59 @@ public class HistoryService {
         return hostHistoryDtoList;
     }
 
+    private int calculateAttitude(int pitch){
+        if(pitch > 20 || pitch < -20)
+            return 1;
+        else if(pitch > 10 || pitch < -10)
+            return 2;
+        else
+            return 3;
+    }
 
+    private PitchGraph calculatePitch(int pitch){
+        if(pitch > 10)
+            return new PitchGraph(100, 0, 0);
+        else if(pitch < -10)
+            return new PitchGraph(0, 0, 100);
+        else
+            return new PitchGraph(0, 100, 0);
+    }
+
+    private YawGraph calculateYaw(int yaw){
+        if(yaw > 20)
+            return new YawGraph(0, 0, 100);
+        else if(yaw < -20)
+            return new YawGraph(100, 0, 0);
+        else
+            return new YawGraph(0, 100, 0);
+    }
+
+    private int calculateVibe(Long sessionId){
+
+        int vibe = 0;
+        int memberCount = groupService.getGroupMemberCount(sessionRepository.findOne(sessionId).getGroup().getId());
+
+        List<History> findHistoryList = historyRepository.findAllGuestsInSession(sessionId);
+        for (History history : findHistoryList) {
+            vibe += history.getAttitude();
+        }
+        return (int) vibe / memberCount;
+    }
+
+    private int calculateAttendance(Long sessionId){
+
+        int memberCount = groupService.getGroupMemberCount(sessionRepository.findOne(sessionId).getGroup().getId());
+        Group findGroup = groupService.findOne(sessionRepository.findOne(sessionId).getGroup().getId());
+
+        List<History> findHistoryList = historyRepository.findAllGuestsInSession(sessionId);
+        for (History history : findHistoryList) {
+            int absenceTime = getAbsenceTime(history.getId());
+            if(absenceTime > findGroup.getAbsenceTime())
+                memberCount --;
+        }
+
+        return memberCount;
+    }
 
     //최근 10개 세션의 히스토리 평균
 //    public RecentTrendDto getGuestRecentTrend(Long userId){
