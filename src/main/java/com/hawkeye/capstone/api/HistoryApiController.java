@@ -1,13 +1,10 @@
 package com.hawkeye.capstone.api;
 
-import com.hawkeye.capstone.domain.RollGraph;
+import com.hawkeye.capstone.domain.PitchGraph;
 import com.hawkeye.capstone.domain.TimeLineLog;
 import com.hawkeye.capstone.domain.YawGraph;
-import com.hawkeye.capstone.dto.GuestHistoryDto;
 import com.hawkeye.capstone.dto.HistoryDto;
-import com.hawkeye.capstone.dto.HostHistoryDto;
 import com.hawkeye.capstone.repository.HistoryRepository;
-import com.hawkeye.capstone.service.GroupService;
 import com.hawkeye.capstone.service.HistoryService;
 import com.hawkeye.capstone.service.SessionService;
 import lombok.AllArgsConstructor;
@@ -16,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 
@@ -28,14 +24,29 @@ public class HistoryApiController {
     private final HistoryService historyService;
     private final SessionService sessionService;
 
+//    //히스토리 저장
+//    @PostMapping("/api/history/createHistory")
+//    @Transactional
+//    public CreateHistoryResponse createHistory(@RequestBody CreateHistoryRequest request){
+//
+//        Long historyId = historyService.createOrUpdateHistory(request.userId, request.sessionId,
+//                request.attendanceCount, request.attitude, request.vibe, request.attendance, request.timeLineLogList,
+//                request.roll, request.yaw
+//        );
+//
+//        //그룹이 수업 중이면 endSession = false
+//        if(sessionService.isOnAir(request.sessionId))
+//            return new CreateHistoryResponse(historyId, false);
+//        else
+//            return new CreateHistoryResponse(historyId, true);
+//    }
     //히스토리 저장
     @PostMapping("/api/history/createHistory")
     @Transactional
-    public CreateHistoryResponse createHistory(@RequestBody CreateHistoryRequest request){
+    public CreateHistoryResponse createHistory(@RequestBody CreateOrUpdateHistoryRequest request){
 
-        Long historyId = historyService.createOrUpdateHistory(request.userId, request.sessionId,
-                request.attendanceCount, request.attitude, request.vibe, request.attendance, request.timeLineLogList,
-                request.roll, request.yaw
+        Long historyId = historyService.createRequest(request.userId, request.sessionId, request.pitch,
+                request.yaw, request.absence
         );
 
         //그룹이 수업 중이면 endSession = false
@@ -101,6 +112,16 @@ public class HistoryApiController {
     }
 
     @Data
+    static class CreateOrUpdateHistoryRequest{
+
+        private Long userId;
+        private Long sessionId;
+        private int pitch;
+        private int yaw;
+        private boolean absence;
+    }
+
+    @Data
     static class CreateHistoryRequest{
 
         private Long userId;
@@ -110,7 +131,7 @@ public class HistoryApiController {
         private int vibe;
         private boolean attendance;
         private List<TimeLineLog> timeLineLogList;
-        private RollGraph roll;
+        private PitchGraph roll;
         private YawGraph yaw;
 
 

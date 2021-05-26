@@ -1,12 +1,11 @@
 package com.hawkeye.capstone.dto;
 
 import com.hawkeye.capstone.domain.GroupRole;
-import com.hawkeye.capstone.domain.RollGraph;
+import com.hawkeye.capstone.domain.PitchGraph;
 import com.hawkeye.capstone.domain.TimeLineLog;
 import com.hawkeye.capstone.domain.YawGraph;
 import lombok.Data;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +23,7 @@ public class HistoryDto {
     private int attitude;
     private boolean isAttend;
     private List<TimeLineLog> timeLineLogList = new ArrayList<>();
-    private RollGraph roll;
+    private PitchGraph roll;
     private YawGraph yaw;
     private List<HistoryGroupMemberDto> historyGroupMemberDtoList = new ArrayList<>();
 
@@ -33,7 +32,7 @@ public class HistoryDto {
     public HistoryDto(GroupRole role, Long historyId, String groupName, int createdYear,
                       int createdMonth, int createdDay, int attendanceCount, int vibe, int attitude,
                       boolean isAttend, List<TimeLineLog> timeLineLogList,
-                      RollGraph roll, YawGraph yaw) {
+                      PitchGraph roll, YawGraph yaw) {
         this.role = role;
         this.historyId = historyId;
         this.groupName = groupName;

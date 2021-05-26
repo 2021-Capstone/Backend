@@ -28,10 +28,15 @@ public class HistoryService {
         return historyRepository.findOne(historyId);
     }
 
+    //히스토리 생성 알고리즘
+    public Long createRequest(Long userId, Long sessionId, int pitch, int yaw, boolean absence) {
+        return null;
+    }
+
     //히스토리 생성 및 변경
     public Long createOrUpdateHistory(Long userId, Long sessionId,
                                       int attendanceCount, int attitude, int vibe, boolean isAttend,
-                                      List<TimeLineLog> timeLineLogList, RollGraph roll,
+                                      List<TimeLineLog> timeLineLogList, PitchGraph roll,
                                       YawGraph yaw) {
 
         User findUser = userRepository.findOne(userId);
@@ -50,7 +55,7 @@ public class HistoryService {
                     .attitude(attitude)
                     .vibe(vibe)
                     .timeLineLogList(timeLineLogList)
-                    .rollGraph(roll)
+                    .pitchGraph(roll)
                     .yawGraph(yaw)
                     .build();
 
@@ -80,16 +85,16 @@ public class HistoryService {
             int newAttitude = (int) ((findHistory.getAttitude() * startToLastSeconds
                     + attitude * lastToNewSeconds) / (startToLastSeconds + lastToNewSeconds));
 
-//            int newVibe = (int) ((findHistory.getVibe() * startToLastSeconds
-//                    + vibe * lastToNewSeconds) / (startToLastSeconds + lastToNewSeconds));
+            int newVibe = (int) ((findHistory.getVibe() * startToLastSeconds
+                    + vibe * lastToNewSeconds) / (startToLastSeconds + lastToNewSeconds));
 
-            RollGraph newRollGraph = new RollGraph(
-                    (int) ((findHistory.getRollGraph().getRollLeft() * startToLastSeconds
-                            + roll.getRollLeft() * lastToNewSeconds) / (startToLastSeconds + lastToNewSeconds)),
-                    (int) ((findHistory.getRollGraph().getRollNormal() * startToLastSeconds
-                            + roll.getRollNormal() * lastToNewSeconds) / (startToLastSeconds + lastToNewSeconds)),
-                    (int) ((findHistory.getRollGraph().getRollRight() * startToLastSeconds
-                            + roll.getRollRight() * lastToNewSeconds) / (startToLastSeconds + lastToNewSeconds))
+            PitchGraph newPitchGraph = new PitchGraph(
+                    (int) ((findHistory.getPitchGraph().getPitchUp() * startToLastSeconds
+                            + roll.getPitchUp() * lastToNewSeconds) / (startToLastSeconds + lastToNewSeconds)),
+                    (int) ((findHistory.getPitchGraph().getPitchNormal() * startToLastSeconds
+                            + roll.getPitchNormal() * lastToNewSeconds) / (startToLastSeconds + lastToNewSeconds)),
+                    (int) ((findHistory.getPitchGraph().getPitchDown() * startToLastSeconds
+                            + roll.getPitchDown() * lastToNewSeconds) / (startToLastSeconds + lastToNewSeconds))
             );
 
             YawGraph newYawGraph = new YawGraph(
@@ -112,7 +117,7 @@ public class HistoryService {
 
             findHistory.setAttitude(newAttitude);
             findHistory.setCreatedAt(LocalDateTime.now());
-            findHistory.setRollGraph(newRollGraph);
+            findHistory.setPitchGraph(newPitchGraph);
             findHistory.setYawGraph(newYawGraph);
             findHistory.setTimeLineLogList(newTimeLineLogList);
 
@@ -165,7 +170,7 @@ public class HistoryService {
                         history.getSession().getGroup().getName(), history.getCreatedAt().getYear(),
                         history.getCreatedAt().getMonthValue(), history.getCreatedAt().getDayOfMonth(),
                         history.getAttendanceCount(), history.getVibe(), history.getAttitude(), history.isAttend(),
-                        timeLineLogRepository.findByHistory(history.getId()), history.getRollGraph(), history.getYawGraph()));
+                        timeLineLogRepository.findByHistory(history.getId()), history.getPitchGraph(), history.getYawGraph()));
             }
         }
         return historyDtoList;
@@ -199,7 +204,7 @@ public class HistoryService {
 
         return new GuestHistoryDto(findHistory.getId(), GroupRole.GUEST, findSession.getGroup().getName(), findSession.getStartTime(),
                 findHistory.getAttendanceCount(), findHistory.getVibe(), findHistory.isAttend(), findHistory.getTimeLineLogList(),
-                findHistory.getRollGraph(), findHistory.getYawGraph());
+                findHistory.getPitchGraph(), findHistory.getYawGraph());
     }
 
     //세션의 호스트 히스토리 열람
@@ -218,6 +223,8 @@ public class HistoryService {
 
         return hostHistoryDtoList;
     }
+
+
 
     //최근 10개 세션의 히스토리 평균
 //    public RecentTrendDto getGuestRecentTrend(Long userId){

@@ -82,7 +82,7 @@ public class FileService {
 
             fileInputStream.close();
 
-            return Base64.encodeBase64(bytes);
+            return bytes;
 
         } catch (Exception e) {
             throw new IllegalStateException("이미지 불러오기 실패");
