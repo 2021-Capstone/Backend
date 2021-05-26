@@ -10,14 +10,14 @@ import javax.persistence.*;
 @Setter
 public class RollGraph {
 
-    private float rollLeft;
-    private float rollNormal;
-    private float rollRight;
+    private int rollLeft;
+    private int rollNormal;
+    private int rollRight;
 
     public RollGraph() {
     }
 
-    public RollGraph(float left, float normal, float right) {
+    public RollGraph(int left, int normal, int right) {
         this.rollLeft = left;
         this.rollNormal = normal;
         this.rollRight = right;

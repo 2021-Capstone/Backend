@@ -15,13 +15,16 @@ import java.time.LocalDateTime;
 public class SessionService {
 
     private final SessionRepository sessionRepository;
+    private final GroupService groupService;
 
-    public Session findOne(Long id){
+    public Session findOne(Long id) {
         return sessionRepository.findOne(id);
     }
 
     @Transactional
-    public Long createSession(Group group){
+    public Long createSession(Long groupId) {
+
+        Group group = groupService.findOne(groupId);
         Session session = new Session();
         session.setStartTime(LocalDateTime.now());
         session.setGroup(group);
@@ -32,11 +35,22 @@ public class SessionService {
     }
 
     @Transactional
-    public Long endSession(Long sessionId){
+    public Long endSession(Long sessionId) {
+
         Session session = sessionRepository.findOne(sessionId);
         session.setEndTime(LocalDateTime.now());
-        session.getGroup().setOnAir(false);
+        //변경 감지
+        Group group = groupService.findOne(session.getGroup().getId());
+        group.setOnAir(false);
 
         return session.getId();
+    }
+
+    @Transactional
+    public boolean isOnAir(Long sessionId) {
+        if (findOne(sessionId).getGroup().isOnAir())
+            return true;
+        else
+            return false;
     }
 }

@@ -50,6 +50,9 @@ public class User implements UserDetails {
     @Column(name = "image_directory_3")
     private String imageDir3;
 
+    @OneToMany(mappedBy = "user")
+    private List<History> historyList;
+
     @ElementCollection(fetch = FetchType.EAGER)
     @Builder.Default
     private List<String> roles = new ArrayList<>();

@@ -7,10 +7,13 @@ import com.hawkeye.capstone.dto.GuestHistoryDto;
 import com.hawkeye.capstone.dto.HistoryDto;
 import com.hawkeye.capstone.dto.HostHistoryDto;
 import com.hawkeye.capstone.repository.HistoryRepository;
+import com.hawkeye.capstone.service.GroupService;
 import com.hawkeye.capstone.service.HistoryService;
+import com.hawkeye.capstone.service.SessionService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -23,17 +26,23 @@ public class HistoryApiController {
 
     private final HistoryRepository historyRepository;
     private final HistoryService historyService;
+    private final SessionService sessionService;
 
     //히스토리 저장
     @PostMapping("/api/history/createHistory")
+    @Transactional
     public CreateHistoryResponse createHistory(@RequestBody CreateHistoryRequest request){
 
-        Long historyId = historyService.createHistory(request.userId, request.sessionId,
+        Long historyId = historyService.createOrUpdateHistory(request.userId, request.sessionId,
                 request.attendanceCount, request.attitude, request.vibe, request.attendance, request.timeLineLogList,
                 request.roll, request.yaw
         );
 
-        return new CreateHistoryResponse(historyId);
+        //그룹이 수업 중이면 endSession = false
+        if(sessionService.isOnAir(request.sessionId))
+            return new CreateHistoryResponse(historyId, false);
+        else
+            return new CreateHistoryResponse(historyId, true);
     }
 
     //히스토리 한 번에 전송
@@ -88,6 +97,7 @@ public class HistoryApiController {
     @AllArgsConstructor
     static class CreateHistoryResponse{
         private Long id;
+        private boolean endSession;
     }
 
     @Data

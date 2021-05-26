@@ -21,6 +21,7 @@ public class HistoryDto {
     private int createdDay;
     private int attendanceCount;
     private int vibe;
+    private int attitude;
     private boolean isAttend;
     private List<TimeLineLog> timeLineLogList = new ArrayList<>();
     private RollGraph roll;
@@ -30,7 +31,7 @@ public class HistoryDto {
     //GUEST 생성자
 
     public HistoryDto(GroupRole role, Long historyId, String groupName, int createdYear,
-                      int createdMonth, int createdDay, int attendanceCount, int vibe,
+                      int createdMonth, int createdDay, int attendanceCount, int vibe, int attitude,
                       boolean isAttend, List<TimeLineLog> timeLineLogList,
                       RollGraph roll, YawGraph yaw) {
         this.role = role;
@@ -41,6 +42,7 @@ public class HistoryDto {
         this.createdDay = createdDay;
         this.attendanceCount = attendanceCount;
         this.vibe = vibe;
+        this.attitude = attitude;
         this.isAttend = isAttend;
         this.timeLineLogList = timeLineLogList;
         this.roll = roll;

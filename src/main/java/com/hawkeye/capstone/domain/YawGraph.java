@@ -10,14 +10,14 @@ import javax.persistence.*;
 @Setter
 public class YawGraph {
 
-    private float yawLeft;
-    private float yawNormal;
-    private float yawRight;
+    private int yawLeft;
+    private int yawNormal;
+    private int yawRight;
 
     public YawGraph() {
     }
 
-    public YawGraph(float left, float normal, float right) {
+    public YawGraph(int left, int normal, int right) {
         this.yawLeft = left;
         this.yawNormal = normal;
         this.yawRight = right;

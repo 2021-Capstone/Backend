@@ -113,8 +113,7 @@ public class GroupApiController {
     //수업 시작
     @PostMapping("/api/group/startSession/{groupId}")
     public SessionDto startSession(@PathVariable("groupId") Long groupId) {
-        Group findGroup = groupService.findOne(groupId);
-        Long sessionId = sessionService.createSession(findGroup);
+        Long sessionId = sessionService.createSession(groupId);
 
         return new SessionDto(sessionId);
     }
