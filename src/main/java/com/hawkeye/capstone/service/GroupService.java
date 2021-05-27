@@ -231,5 +231,12 @@ public class GroupService {
             }
         }
     }
+
+    //수업중인지 체크
+    @Transactional
+    public boolean checkOnAir(Long groupId) {
+        Group findGroup = findOne(groupId);
+        return findGroup.isOnAir();
+    }
 }
 

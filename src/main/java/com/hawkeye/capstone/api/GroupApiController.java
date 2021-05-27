@@ -123,7 +123,19 @@ public class GroupApiController {
     public SessionDto endSession(@PathVariable("sessionId") Long sessionId) {
 
         return new SessionDto(sessionService.endSession(sessionId));
+    }
 
+    //수업중인지 확인
+    @GetMapping("/api/group/isOnAir/{groupId}")
+    public OnAirDto checkOnAir(@PathVariable("groupId") Long groupId){
+        boolean isOnAir = groupService.checkOnAir(groupId);
+        return new OnAirDto(isOnAir);
+    }
+
+    @Data
+    @AllArgsConstructor
+    static class OnAirDto{
+        boolean isOnAir;
     }
 
     @Data
