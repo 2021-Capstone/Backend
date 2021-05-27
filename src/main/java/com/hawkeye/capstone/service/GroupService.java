@@ -233,9 +233,18 @@ public class GroupService {
     }
 
     //수업중인지 체크
-    public boolean checkOnAir(Long groupId) {
+    @Transactional
+    public OnAirDto checkOnAir(Long groupId) {
+
         Group findGroup = findOne(groupId);
-        return findGroup.isOnAir();
+        List<Session> findSessionList = findGroup.getSessionList();
+        //수업중이 아닌 경우
+        if(!findGroup.isOnAir())
+            return new OnAirDto(null, false);
+        //수업중인 경우
+        else{
+            return new OnAirDto(findSessionList.get(findSessionList.size() - 1).getId(), true);
+        }
     }
 }
 
