@@ -59,10 +59,9 @@ public class HistoryApiController {
     @Transactional
     public GetVibeResponse getVibe(@PathVariable Long sessionId){
 
-        Session findSession = sessionService.findOne(sessionId);
-        List<History> historyList = findSession.getHistoryList();
+        List<History> findHistoryList = historyRepository.findAllGuestsInSession(sessionId);
 
-        return new GetVibeResponse(historyList.get(0).getVibe());
+        return new GetVibeResponse(findHistoryList.get(0).getVibe());
     }
 
     //히스토리 한 번에 전송

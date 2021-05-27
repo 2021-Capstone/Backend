@@ -4,25 +4,16 @@ import com.hawkeye.capstone.domain.*;
 import com.hawkeye.capstone.dto.GroupSearchDto;
 import com.hawkeye.capstone.dto.RecentTrendDto;
 import com.hawkeye.capstone.dto.UserWaitingListDto;
-import com.hawkeye.capstone.repository.GroupRepository;
 import com.hawkeye.capstone.repository.QueueRepository;
-import com.hawkeye.capstone.service.GroupService;
-import com.hawkeye.capstone.service.QueueService;
-import com.hawkeye.capstone.service.UserService;
-import com.hawkeye.capstone.service.WaitingListService;
-import lombok.AllArgsConstructor;
+import com.hawkeye.capstone.service.*;
 import lombok.Data;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,6 +23,7 @@ public class MainPageApiController {
     private final UserService userService;
     private final WaitingListService waitingListService;
     private final QueueRepository queueRepository;
+    private final HistoryService historyService;
 
     @GetMapping("api/main/getWaitingList/{userId}")
     //자신이 속한 WaitingList 전부 조회
@@ -85,13 +77,16 @@ public class MainPageApiController {
 
     //호스트 최근동향
     @GetMapping("/api/main/getHostRecentTrends/{userId}")
-    public RecentTrendDto getHostRecent(@PathVariable Long userId){
-        return new RecentTrendDto(GroupRole.HOST, 30, 50, 40);
+    public RecentTrendDto getRecentHost(@PathVariable Long userId){
+
+        return historyService.getRecentHost(userId);
     }
+
     //게스트 최근동향
     @GetMapping("/api/main/getGuestRecentTrends/{userId}")
-    public RecentTrendDto getGuestRecent(@PathVariable Long userId){
-        return new RecentTrendDto(GroupRole.GUEST, 70, 50, 30);
+    public RecentTrendDto getRecentGuest(@PathVariable Long userId){
+
+        return historyService.getRecentGuest(userId);
     }
 
 //    @Data

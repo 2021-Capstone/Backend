@@ -69,4 +69,6 @@ public class HistoryRepository {
 
         return findSession.getHistoryList();
     }
+
+    //Host의 마지막 수업
 }

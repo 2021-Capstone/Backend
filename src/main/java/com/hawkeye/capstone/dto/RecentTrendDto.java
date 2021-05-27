@@ -9,12 +9,10 @@ public class RecentTrendDto {
     private GroupRole groupRole;
     private int attendanceRate;
     private int concentrationRate;
-    private int drowsinessRate;
 
-    public RecentTrendDto(GroupRole groupRole, int attendanceRate, int concentrationRate, int drowsinessRate) {
+    public RecentTrendDto(GroupRole groupRole, int attendanceRate, int concentrationRate) {
         this.groupRole = groupRole;
         this.attendanceRate = attendanceRate;
         this.concentrationRate = concentrationRate;
-        this.drowsinessRate = drowsinessRate;
     }
 }

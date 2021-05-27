@@ -2,10 +2,7 @@ package com.hawkeye.capstone.service;
 
 import com.hawkeye.capstone.domain.*;
 import com.hawkeye.capstone.dto.*;
-import com.hawkeye.capstone.repository.HistoryRepository;
-import com.hawkeye.capstone.repository.SessionRepository;
-import com.hawkeye.capstone.repository.TimeLineLogRepository;
-import com.hawkeye.capstone.repository.UserRepository;
+import com.hawkeye.capstone.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +23,7 @@ public class HistoryService {
     private final UserRepository userRepository;
     private final TimeLineLogRepository timeLineLogRepository;
     private final GroupService groupService;
+    private final GroupRepository groupRepository;
 
     public History findOne(Long historyId) {
         return historyRepository.findOne(historyId);
@@ -47,7 +45,7 @@ public class HistoryService {
         if (absence) {
             //새로운 TimeLineLog 생성
             if (findHistory == null || findHistory.getTimeLineLogList().isEmpty() ||
-                    findHistory.getTimeLineLogList().get(findHistory.getTimeLineLogList().size() - 1).isEnd() == true){
+                    findHistory.getTimeLineLogList().get(findHistory.getTimeLineLogList().size() - 1).isEnd() == true) {
 
                 TimeLineLog timeLineLog = new TimeLineLog();
 
@@ -64,12 +62,12 @@ public class HistoryService {
         }
 
         //자리를 비우지 않은 경우
-        else{
+        else {
             //히스토리 첫 생성
-            if(findHistory == null);
+            if (findHistory == null) ;
 
-            //자리를 비웠다가 돌아온 경우
-            else if(!findHistory.getTimeLineLogList().isEmpty() && findHistory.getTimeLineLogList().get(findHistory.getTimeLineLogList().size() - 1).isEnd() == false){
+                //자리를 비웠다가 돌아온 경우
+            else if (!findHistory.getTimeLineLogList().isEmpty() && findHistory.getTimeLineLogList().get(findHistory.getTimeLineLogList().size() - 1).isEnd() == false) {
                 Long timeLineLogId = findHistory.getTimeLineLogList().get(findHistory.getTimeLineLogList().size() - 1).getId();
                 //변경 감지
                 TimeLineLog findTimeLineLog = timeLineLogRepository.findOne(timeLineLogId);
@@ -97,14 +95,14 @@ public class HistoryService {
                 findUser.getHistoryList().get(findUser.getHistoryList().size() - 1).getSession().getId() != sessionId) {
 
             List<TimeLineLog> timeLineLogList = new ArrayList<>();
-            if(timeLineLog != null)
+            if (timeLineLog != null)
                 timeLineLogList.add(timeLineLog);
 
             History history = History.builder()
                     .user(findUser)
                     .session(findSession)
                     .createdAt(LocalDateTime.now())
-                    .isAttend(absence)
+                    .isAttend(true)
                     .attendanceCount(groupService.getGroupMemberCount(findSession.getGroup().getId()))
                     .attitude(attitude)
                     .vibe(3)
@@ -117,7 +115,7 @@ public class HistoryService {
             historyRepository.save(history);
             findUser.getHistoryList().add(history);
 
-            if(timeLineLog != null){
+            if (timeLineLog != null) {
                 //변경 감지
                 TimeLineLog findTimeLineLog = timeLineLogRepository.findOne(timeLineLog.getId());
                 findTimeLineLog.setHistory(history);
@@ -164,7 +162,7 @@ public class HistoryService {
 
             List<TimeLineLog> newTimeLineLogList = findHistory.getTimeLineLogList();
 
-            if(timeLineLog != null){
+            if (timeLineLog != null) {
                 timeLineLog.setHistory(findHistory);
                 newTimeLineLogList.add(timeLineLog);
             }
@@ -176,6 +174,8 @@ public class HistoryService {
             findHistory.setTimeLineLogList(newTimeLineLogList);
             findHistory.setAttendanceCount(calculateAttendance(sessionId));
             findHistory.setVibe(calculateVibe(sessionId));
+            if(getAbsenceTime(findHistory.getId()) > findSession.getGroup().getAbsenceTime())
+                findHistory.setAttend(false);
 
             return findHistory.getId();
         }
@@ -279,34 +279,34 @@ public class HistoryService {
         return hostHistoryDtoList;
     }
 
-    private int calculateAttitude(int pitch){
-        if(pitch > 20 || pitch < -20)
+    private int calculateAttitude(int pitch) {
+        if (pitch > 20 || pitch < -20)
             return 1;
-        else if(pitch > 10 || pitch < -10)
+        else if (pitch > 10 || pitch < -10)
             return 2;
         else
             return 3;
     }
 
-    private PitchGraph calculatePitch(int pitch){
-        if(pitch > 10)
+    private PitchGraph calculatePitch(int pitch) {
+        if (pitch > 10)
             return new PitchGraph(100, 0, 0);
-        else if(pitch < -10)
+        else if (pitch < -10)
             return new PitchGraph(0, 0, 100);
         else
             return new PitchGraph(0, 100, 0);
     }
 
-    private YawGraph calculateYaw(int yaw){
-        if(yaw > 20)
+    private YawGraph calculateYaw(int yaw) {
+        if (yaw > 20)
             return new YawGraph(0, 0, 100);
-        else if(yaw < -20)
+        else if (yaw < -20)
             return new YawGraph(100, 0, 0);
         else
             return new YawGraph(0, 100, 0);
     }
 
-    private int calculateVibe(Long sessionId){
+    private int calculateVibe(Long sessionId) {
 
         int vibe = 0;
         int memberCount = groupService.getGroupMemberCount(sessionRepository.findOne(sessionId).getGroup().getId());
@@ -318,25 +318,90 @@ public class HistoryService {
         return (int) vibe / memberCount;
     }
 
-    private int calculateAttendance(Long sessionId){
+    private int calculateAttendance(Long sessionId) {
 
-        int memberCount = groupService.getGroupMemberCount(sessionRepository.findOne(sessionId).getGroup().getId());
-        Group findGroup = groupService.findOne(sessionRepository.findOne(sessionId).getGroup().getId());
+        int memberCount = 0;
 
         List<History> findHistoryList = historyRepository.findAllGuestsInSession(sessionId);
         for (History history : findHistoryList) {
-            int absenceTime = getAbsenceTime(history.getId());
-            if(absenceTime > findGroup.getAbsenceTime())
-                memberCount --;
+            if(history.isAttend())
+                memberCount++;
         }
 
         return memberCount;
     }
 
-    //최근 10개 세션의 히스토리 평균
-//    public RecentTrendDto getGuestRecentTrend(Long userId){
-//
-//        User findUser = userRepository.findOne(userId);
-//    }
+    //호스트 최근 동향
+    public RecentTrendDto getRecentHost(Long userId) {
 
+        Long findSessionId = null;
+
+        List<Group> findGroupList = groupRepository.findByHost(userId);
+
+        //마지막 Host 수업의 sessionId
+        for (Group group : findGroupList) {
+
+            List<Session> findSessionList = group.getSessionList();
+            findSessionId = findSessionList.get(0).getId();
+
+            for (Session session : findSessionList) {
+                if (findSessionId < session.getId())
+                    findSessionId = session.getId();
+            }
+        }
+
+        //Host 이력이 없는 경우
+        if (findSessionId == null)
+            return new RecentTrendDto(GroupRole.HOST, 0, 0);
+            //Host 이력이 있는 경우
+        else {
+            List<History> findHistoryList = historyRepository.findAllGuestsInSession(findSessionId);
+            Session findSession = sessionRepository.findOne(findSessionId);
+            int totalCount = groupService.getGroupMemberCount(findSession.getGroup().getId());
+            int memberCount = findHistoryList.get(0).getAttendanceCount();
+            int vibe = findHistoryList.get(0).getVibe();
+
+            return new RecentTrendDto(GroupRole.HOST, (int) memberCount / totalCount * 100,
+                    vibe);
+        }
+    }
+
+    //게스트 최근 동향
+    public RecentTrendDto getRecentGuest(Long userId) {
+
+        User findUser = userRepository.findOne(userId);
+        List<History> findHistoryList = findUser.getHistoryList();
+
+        //Guest 이력이 없는 경우
+        if(findHistoryList.isEmpty())
+        {
+            return new RecentTrendDto(GroupRole.GUEST, 0, 0);
+        }
+        int attendCount = 0;
+        int totalCount = 0;
+        int attitude = 0;
+
+        //히스토리가 10개 미만
+        if (findHistoryList.size() <= 10) {
+            for (History history : findHistoryList) {
+                if (history.isAttend())
+                    attendCount++;
+                totalCount++;
+                attitude += history.getAttitude();
+            }
+        }
+
+        //히스토리가 10개 이상
+        else {
+            for (int i = 0; i < 10; i++) {
+                if (findHistoryList.get(i).isAttend())
+                    attendCount++;
+                totalCount++;
+                attitude += findHistoryList.get(i).getAttitude();
+            }
+        }
+
+        return new RecentTrendDto(GroupRole.GUEST, (int) attendCount / totalCount * 100,
+                (int) attitude / totalCount);
+    }
 }
