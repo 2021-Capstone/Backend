@@ -126,7 +126,7 @@ public class GroupApiController {
     }
 
     //수업중인지 확인
-    @GetMapping("/api/group/isOnAir/{groupId}")
+    @GetMapping("/api/group/checkOnAir/{groupId}")
     public OnAirDto checkOnAir(@PathVariable("groupId") Long groupId){
         boolean isOnAir = groupService.checkOnAir(groupId);
         return new OnAirDto(isOnAir);
