@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +33,11 @@ public class HistoryService {
 
     //히스토리 생성 알고리즘
     public Long createRequest(Long userId, Long sessionId, int pitch, int yaw, boolean absence) {
+        User findUser = userRepository.findOne(userId);
         History findHistory = historyRepository.findOneGuestInSession(userId, sessionId);
+        Session findSession = sessionRepository.findOne(sessionId);
+
+        LocalDateTime sessionStartTime = findSession.getStartTime();
 
         PitchGraph pitchGraph = calculatePitch(pitch);
         YawGraph yawGraph = calculateYaw(yaw);
@@ -41,14 +46,15 @@ public class HistoryService {
         //자리를 비운 경우
         if (absence) {
             //새로운 TimeLineLog 생성
-            if (findHistory.getTimeLineLogList().isEmpty() ||
+            if (findHistory == null || findHistory.getTimeLineLogList().isEmpty() ||
                     findHistory.getTimeLineLogList().get(findHistory.getTimeLineLogList().size() - 1).isEnd() == true){
 
                 TimeLineLog timeLineLog = new TimeLineLog();
+
                 LocalDateTime startTime = LocalDateTime.now();
-                timeLineLog.setStartHour(startTime.getHour());
-                timeLineLog.setStartMinute(startTime.getMinute());
-                timeLineLog.setStartSecond(startTime.getSecond());
+                timeLineLog.setStartHour((int) ChronoUnit.HOURS.between(sessionStartTime, startTime));
+                timeLineLog.setStartMinute((int) ChronoUnit.MINUTES.between(sessionStartTime, startTime));
+                timeLineLog.setStartSecond((int) ChronoUnit.SECONDS.between(sessionStartTime, startTime));
                 timeLineLog.setState("absence");
                 timeLineLogRepository.save(timeLineLog);
 
@@ -59,15 +65,19 @@ public class HistoryService {
 
         //자리를 비우지 않은 경우
         else{
+            //히스토리 첫 생성
+            if(findHistory == null);
+
             //자리를 비웠다가 돌아온 경우
-            if(findHistory.getTimeLineLogList().get(findHistory.getTimeLineLogList().size() - 1).isEnd() == false){
+            else if(!findHistory.getTimeLineLogList().isEmpty() && findHistory.getTimeLineLogList().get(findHistory.getTimeLineLogList().size() - 1).isEnd() == false){
                 Long timeLineLogId = findHistory.getTimeLineLogList().get(findHistory.getTimeLineLogList().size() - 1).getId();
                 //변경 감지
                 TimeLineLog findTimeLineLog = timeLineLogRepository.findOne(timeLineLogId);
                 LocalDateTime endTime = LocalDateTime.now();
-                findTimeLineLog.setEndHour(endTime.getHour());
-                findTimeLineLog.setEndMinute(endTime.getMinute());
-                findTimeLineLog.setEndSecond(endTime.getSecond());
+
+                findTimeLineLog.setEndHour((int) ChronoUnit.HOURS.between(sessionStartTime, endTime));
+                findTimeLineLog.setEndMinute((int) ChronoUnit.MINUTES.between(sessionStartTime, endTime));
+                findTimeLineLog.setEndSecond((int) ChronoUnit.SECONDS.between(sessionStartTime, endTime));
                 findTimeLineLog.setEnd(true);
             }
 

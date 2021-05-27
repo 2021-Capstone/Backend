@@ -54,14 +54,15 @@ public class HistoryApiController {
             return new CreateHistoryResponse(historyId, true);
     }
 
-    //수업 분위기
+    //수업 전체 분위기
     @GetMapping("/api/history/getVibe/{sessionId}")
-    public int getVibe(@PathVariable Long sessionId){
+    @Transactional
+    public GetVibeResponse getVibe(@PathVariable Long sessionId){
 
         Session findSession = sessionService.findOne(sessionId);
         List<History> historyList = findSession.getHistoryList();
 
-        return historyList.get(0).getVibe();
+        return new GetVibeResponse(historyList.get(0).getVibe());
     }
 
     //히스토리 한 번에 전송
@@ -139,10 +140,14 @@ public class HistoryApiController {
         private int vibe;
         private boolean attendance;
         private List<TimeLineLog> timeLineLogList;
-        private PitchGraph roll;
+        private PitchGraph pitch;
         private YawGraph yaw;
 
+    }
 
-
+    @Data
+    @AllArgsConstructor
+    static class GetVibeResponse{
+        private int vibe;
     }
 }

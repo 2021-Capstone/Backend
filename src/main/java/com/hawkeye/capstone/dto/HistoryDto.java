@@ -23,7 +23,7 @@ public class HistoryDto {
     private int attitude;
     private boolean isAttend;
     private List<TimeLineLog> timeLineLogList = new ArrayList<>();
-    private PitchGraph roll;
+    private PitchGraph pitch;
     private YawGraph yaw;
     private List<HistoryGroupMemberDto> historyGroupMemberDtoList = new ArrayList<>();
 
@@ -32,7 +32,7 @@ public class HistoryDto {
     public HistoryDto(GroupRole role, Long historyId, String groupName, int createdYear,
                       int createdMonth, int createdDay, int attendanceCount, int vibe, int attitude,
                       boolean isAttend, List<TimeLineLog> timeLineLogList,
-                      PitchGraph roll, YawGraph yaw) {
+                      PitchGraph pitch, YawGraph yaw) {
         this.role = role;
         this.historyId = historyId;
         this.groupName = groupName;
@@ -44,7 +44,7 @@ public class HistoryDto {
         this.attitude = attitude;
         this.isAttend = isAttend;
         this.timeLineLogList = timeLineLogList;
-        this.roll = roll;
+        this.pitch = pitch;
         this.yaw = yaw;
     }
 

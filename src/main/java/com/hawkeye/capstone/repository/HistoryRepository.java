@@ -57,8 +57,6 @@ public class HistoryRepository {
         for (History history : historyList) {
             if(history.getSession().getId() == sessionId)
                 return history;
-            else
-                throw new IllegalStateException("해당 수업의 히스토리가 없습니다.");
         }
 
         return null;

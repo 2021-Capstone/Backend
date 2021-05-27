@@ -21,12 +21,12 @@ public class GuestHistoryDto {
     private int vibe;
     private boolean isAttendance;
     private List<TimeLineLog> timeLineLogList = new ArrayList<>();
-    private PitchGraph roll;
+    private PitchGraph pitch;
     private YawGraph yaw;
 
     //게스트용 HistoryDto
     public GuestHistoryDto(Long id, GroupRole role, String groupName, LocalDateTime createdAt, int attendanceCount,
-                           int vibe, boolean isAttendance, List<TimeLineLog> timeLineLogList, PitchGraph roll, YawGraph yaw) {
+                           int vibe, boolean isAttendance, List<TimeLineLog> timeLineLogList, PitchGraph pitch, YawGraph yaw) {
         this.id = id;
         this.role = role;
         this.groupName = groupName;
@@ -35,7 +35,7 @@ public class GuestHistoryDto {
         this.vibe = vibe;
         this.isAttendance = isAttendance;
         this.timeLineLogList = timeLineLogList;
-        this.roll = roll;
+        this.pitch = pitch;
         this.yaw = yaw;
     }
 
