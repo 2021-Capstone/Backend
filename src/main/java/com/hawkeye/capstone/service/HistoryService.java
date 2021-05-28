@@ -280,27 +280,27 @@ public class HistoryService {
     }
 
     private int calculateAttitude(int pitch) {
-        if (pitch > 20 || pitch < -20)
+        if (pitch >= 10 || pitch < 3)
             return 1;
-        else if (pitch > 10 || pitch < -10)
+        else if (pitch > 8 || pitch < 5)
             return 2;
         else
             return 3;
     }
 
     private PitchGraph calculatePitch(int pitch) {
-        if (pitch > 10)
+        if (pitch > 8)
             return new PitchGraph(100, 0, 0);
-        else if (pitch < -10)
+        else if (pitch < 5)
             return new PitchGraph(0, 0, 100);
         else
             return new PitchGraph(0, 100, 0);
     }
 
     private YawGraph calculateYaw(int yaw) {
-        if (yaw > 20)
+        if (yaw < -3.6)
             return new YawGraph(0, 0, 100);
-        else if (yaw < -20)
+        else if (yaw > -2)
             return new YawGraph(100, 0, 0);
         else
             return new YawGraph(0, 100, 0);
