@@ -216,7 +216,7 @@ public class HistoryService {
                         history.getCreatedAt().getMonthValue(), history.getCreatedAt().getDayOfMonth(),
                         history.getAttendanceCount(), history.getVibe(), historyGroupMemberDtoList));
 
-                break;
+
             }
 
             //GUEST가 호출한 경우
