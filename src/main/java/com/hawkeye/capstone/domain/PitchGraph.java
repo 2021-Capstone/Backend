@@ -10,14 +10,14 @@ import javax.persistence.*;
 @Setter
 public class PitchGraph {
 
-    private int pitchUp;
-    private int pitchNormal;
-    private int pitchDown;
+    private float pitchUp;
+    private float pitchNormal;
+    private float pitchDown;
 
     public PitchGraph() {
     }
 
-    public PitchGraph(int up, int normal, int down) {
+    public PitchGraph(float up, float normal, float down) {
         this.pitchUp = up;
         this.pitchNormal = normal;
         this.pitchDown = down;

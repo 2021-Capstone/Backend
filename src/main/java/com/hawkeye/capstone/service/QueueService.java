@@ -57,9 +57,11 @@ public class QueueService {
         //각 Queue가 입장 신청을 한 그룹의 waitingList인지 조회
         for (Queue queue : queueList) {
             if(queue.getWaitingList().getGroup().getId() == groupId){
-                //변경 감지 -> status REJECT로 변경
-                queueRepository.setStatus(queue, WaitingStatus.REJECT);
+//                //변경 감지 -> status REJECT로 변경
+//                queueRepository.setStatus(queue, WaitingStatus.REJECT);
                 waitingListService.updateCount(queue.getWaitingList(), -1);
+                //해당 Queue 삭제
+                queueRepository.delete(queue);
             }
         }
     }

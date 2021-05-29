@@ -30,7 +30,7 @@ public class HistoryService {
     }
 
     //히스토리 생성 알고리즘
-    public Long createRequest(Long userId, Long sessionId, int pitch, int yaw, boolean absence) {
+    public Long createRequest(Long userId, Long sessionId, float pitch, float yaw, boolean absence) {
         User findUser = userRepository.findOne(userId);
         History findHistory = historyRepository.findOneGuestInSession(userId, sessionId);
         Session findSession = sessionRepository.findOne(sessionId);
@@ -40,6 +40,8 @@ public class HistoryService {
         PitchGraph pitchGraph = calculatePitch(pitch);
         YawGraph yawGraph = calculateYaw(yaw);
         int attitude = calculateAttitude(pitch);
+        System.out.println("==================");
+        System.out.println("attitude = " + attitude);
 
         //자리를 비운 경우
         if (absence) {
@@ -135,7 +137,9 @@ public class HistoryService {
             long startToLastSeconds = startBetweenLast.getSeconds();
             long lastToNewSeconds = lastBetweenNew.getSeconds();
 
-            int newAttitude = (int) ((findHistory.getAttitude() * startToLastSeconds
+//            int newAttitude = (int) ((findHistory.getAttitude() * startToLastSeconds
+//                    + attitude * lastToNewSeconds) / (startToLastSeconds + lastToNewSeconds));
+            float newAttitude = ((findHistory.getAttitude() * startToLastSeconds
                     + attitude * lastToNewSeconds) / (startToLastSeconds + lastToNewSeconds));
 
 //            int newVibe = (int) ((findHistory.getVibe() * startToLastSeconds
@@ -205,7 +209,7 @@ public class HistoryService {
                     historyGroupMemberDtoList.add(new HistoryGroupMemberDto(
                             history1.getSession().getGroup().getName(),
                             history1.getUser().getEmail(),
-                            history1.getAttitude(),
+                            (int)history1.getAttitude(),
                             getAbsenceTime(history1.getId()),
                             history1.isAttend()
                     ));
@@ -216,7 +220,6 @@ public class HistoryService {
                         history.getCreatedAt().getMonthValue(), history.getCreatedAt().getDayOfMonth(),
                         history.getAttendanceCount(), history.getVibe(), historyGroupMemberDtoList));
 
-
             }
 
             //GUEST가 호출한 경우
@@ -224,7 +227,7 @@ public class HistoryService {
                 historyDtoList.add(new HistoryDto(GroupRole.GUEST, history.getId(),
                         history.getSession().getGroup().getName(), history.getCreatedAt().getYear(),
                         history.getCreatedAt().getMonthValue(), history.getCreatedAt().getDayOfMonth(),
-                        history.getAttendanceCount(), history.getVibe(), history.getAttitude(), history.isAttend(),
+                        history.getAttendanceCount(), history.getVibe(), (int)history.getAttitude(), history.isAttend(),
                         timeLineLogRepository.findByHistory(history.getId()), history.getPitchGraph(), history.getYawGraph()));
             }
         }
@@ -279,7 +282,7 @@ public class HistoryService {
         return hostHistoryDtoList;
     }
 
-    private int calculateAttitude(int pitch) {
+    private int calculateAttitude(float pitch) {
         if (pitch >= 10 || pitch < 3)
             return 1;
         else if (pitch > 8 || pitch < 5)
@@ -288,7 +291,7 @@ public class HistoryService {
             return 3;
     }
 
-    private PitchGraph calculatePitch(int pitch) {
+    private PitchGraph calculatePitch(float pitch) {
         if (pitch > 8)
             return new PitchGraph(100, 0, 0);
         else if (pitch < 5)
@@ -297,7 +300,7 @@ public class HistoryService {
             return new PitchGraph(0, 100, 0);
     }
 
-    private YawGraph calculateYaw(int yaw) {
+    private YawGraph calculateYaw(float yaw) {
         if (yaw < -3.6)
             return new YawGraph(0, 0, 100);
         else if (yaw > -2)
@@ -402,6 +405,6 @@ public class HistoryService {
         }
 
         return new RecentTrendDto(GroupRole.GUEST, (int) attendCount / totalCount * 100,
-                (int) attitude / totalCount);
+                attitude / totalCount);
     }
 }

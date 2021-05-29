@@ -37,7 +37,7 @@ public class History {
 
     private int attendanceCount;
 
-    private int attitude;
+    private float attitude;
 
     private int vibe;
 
