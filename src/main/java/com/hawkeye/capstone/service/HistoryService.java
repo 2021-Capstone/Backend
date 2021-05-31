@@ -207,7 +207,7 @@ public class HistoryService {
                 for (History history1 : historyListInSession) {
 
                     historyGroupMemberDtoList.add(new HistoryGroupMemberDto(
-                            history1.getSession().getGroup().getName(),
+                            history1.getUser().getName(),
                             history1.getUser().getEmail(),
                             (int)history1.getAttitude(),
                             getAbsenceTime(history1.getId()),
