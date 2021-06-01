@@ -34,7 +34,7 @@ public class UserApiController {
     public CreateUserResponse registerMember(@RequestParam("email") String email, @RequestParam("name") String name,
                                              @RequestParam("password") String password, @RequestParam("passwordConfirm") String passwordConfirm,
                                              @RequestParam("file1") MultipartFile file1, @RequestParam("file2") MultipartFile file2,
-                                             @RequestParam("file3") MultipartFile file3){
+                                             @RequestParam("file3") MultipartFile file3) {
 
         UserDto userDto = new UserDto(email, name, fileService.fileUpload(file1),
                 fileService.fileUpload(file2), fileService.fileUpload(file3), password);
@@ -87,7 +87,7 @@ public class UserApiController {
 
         User findUser = userService.findByEmail(request.getEmail());
 
-        if(userService.loadUserByEmail(request.getEmail(), request.getPassword())){
+        if (userService.loadUserByEmail(request.getEmail(), request.getPassword())) {
             //토큰 생성
             String token = null;
 
@@ -95,9 +95,7 @@ public class UserApiController {
 
             return new LogInResponse(findUser.getName(), fileService.fileDownload(findUser.getImageDir()),
                     findUser.getEmail(), token, findUser.getId());
-        }
-
-        else{
+        } else {
             throw new IllegalStateException("로그인에 실패했습니다.");
         }
 
@@ -117,8 +115,8 @@ public class UserApiController {
     //회원 정보 수정
     @PostMapping("/api/mypage/{userId}")
     public UserSearchDto updateUser(@PathVariable("userId") Long userId, @RequestParam("email") String email,
-                                         @RequestParam("name") String name, @RequestParam("file1") MultipartFile file1,
-                                         @RequestParam("file2") MultipartFile file2, @RequestParam("file3") MultipartFile file3) {
+                                    @RequestParam("name") String name, @RequestParam("file1") MultipartFile file1,
+                                    @RequestParam("file2") MultipartFile file2, @RequestParam("file3") MultipartFile file3) {
 
         userService.update(userId, email, name, fileService.fileUpload(file1),
                 fileService.fileUpload(file2), fileService.fileUpload(file3));
@@ -129,10 +127,20 @@ public class UserApiController {
 
     //프로필 이미지 base64 인코딩하여 전송
     @GetMapping("/api/image/getImage/{userId}")
-    public byte[] getImage(@PathVariable("userId") Long userId) {
+    public getImageDto getImage(@PathVariable("userId") Long userId) {
         User findUser = userService.findOne(userId);
 
-        return fileService.fileDownload(findUser.getImageDir());
+        return new getImageDto(fileService.fileDownload(findUser.getImageDir()),
+                fileService.fileDownload(findUser.getImageDir2()),
+                fileService.fileDownload(findUser.getImageDir3()));
+    }
+
+    @Data
+    @AllArgsConstructor
+    static class getImageDto {
+        byte[] image1;
+        byte[] image2;
+        byte[] image3;
     }
 
     @Data
@@ -147,7 +155,7 @@ public class UserApiController {
 
     @Data
     @AllArgsConstructor
-    static class GroupDto{
+    static class GroupDto {
         private Long groupId;
     }
 
