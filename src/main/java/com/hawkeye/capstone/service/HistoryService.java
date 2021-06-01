@@ -40,9 +40,6 @@ public class HistoryService {
         PitchGraph pitchGraph = calculatePitch(pitch);
         YawGraph yawGraph = calculateYaw(yaw);
         int attitude = calculateAttitude(pitch);
-        System.out.println("==================");
-        System.out.println("attitude = " + attitude);
-
         //자리를 비운 경우
         if (absence) {
             //새로운 TimeLineLog 생성
@@ -363,11 +360,15 @@ public class HistoryService {
         for (Group group : findGroupList) {
 
             List<Session> findSessionList = group.getSessionList();
-            findSessionId = findSessionList.get(0).getId();
+            //그룹의 수업이 있으면
+            if(!findSessionList.isEmpty()){
 
-            for (Session session : findSessionList) {
-                if (findSessionId < session.getId())
-                    findSessionId = session.getId();
+                findSessionId = findSessionList.get(0).getId();
+
+                for (Session session : findSessionList) {
+                    if (findSessionId < session.getId())
+                        findSessionId = session.getId();
+                }
             }
         }
 
