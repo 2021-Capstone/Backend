@@ -41,7 +41,7 @@ public class HistoryApiController {
     //히스토리 저장
     @PostMapping("/api/history/createHistory")
     @Transactional
-    public CreateHistoryResponse createHistory(@RequestBody CreateOrUpdateHistoryRequest request){
+    public synchronized CreateHistoryResponse createHistory(@RequestBody CreateOrUpdateHistoryRequest request){
 
         Long historyId = historyService.createRequest(request.userId, request.sessionId, request.pitch,
                 request.yaw, request.absence
