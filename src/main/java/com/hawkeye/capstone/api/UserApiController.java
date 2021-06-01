@@ -94,6 +94,8 @@ public class UserApiController {
             List<GroupSearchDto> groupSearchDtoList = groupService.getGroupListWithRole(findUser.getId());
 
             return new LogInResponse(findUser.getName(), fileService.fileDownload(findUser.getImageDir()),
+                    fileService.fileDownload(findUser.getImageDir2()),
+                    fileService.fileDownload(findUser.getImageDir3()),
                     findUser.getEmail(), token, findUser.getId());
         } else {
             throw new IllegalStateException("로그인에 실패했습니다.");
@@ -147,7 +149,9 @@ public class UserApiController {
     @AllArgsConstructor
     static class LogInResponse {
         private String name;
-        private byte[] profileImage;
+        private byte[] image1;
+        private byte[] image2;
+        private byte[] image3;
         private String email;
         private String token;
         private Long userId;
