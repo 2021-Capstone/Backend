@@ -31,80 +31,74 @@ public class HistoryService {
     }
 
     //히스토리 생성 알고리즘
-    public Long createRequest(Long userId, Long sessionId, float pitch, float yaw, boolean absence) {
-        if(lock){
-            lock = false;
-            User findUser = userRepository.findOne(userId);
-            History findHistory = historyRepository.findOneGuestInSession(userId, sessionId);
-            Session findSession = sessionRepository.findOne(sessionId);
+    public synchronized Long createRequest(Long userId, Long sessionId, float pitch, float yaw, boolean absence) {
 
-            LocalDateTime sessionStartTime = findSession.getStartTime();
+        User findUser = userRepository.findOne(userId);
+        History findHistory = historyRepository.findOneGuestInSession(userId, sessionId);
+        Session findSession = sessionRepository.findOne(sessionId);
 
-            PitchGraph pitchGraph = calculatePitch(pitch);
-            YawGraph yawGraph = calculateYaw(yaw);
-            int attitude = calculateAttitude(pitch);
-            //자리를 비운 경우
-            if (absence) {
-                //새로운 TimeLineLog 생성
-                if (findHistory == null || findHistory.getTimeLineLogList().isEmpty() ||
-                        findHistory.getTimeLineLogList().get(findHistory.getTimeLineLogList().size() - 1).isEnd() == true) {
+        LocalDateTime sessionStartTime = findSession.getStartTime();
 
-                    TimeLineLog timeLineLog = new TimeLineLog();
+        PitchGraph pitchGraph = calculatePitch(pitch);
+        YawGraph yawGraph = calculateYaw(yaw);
+        int attitude = calculateAttitude(pitch);
+        //자리를 비운 경우
+        if (absence) {
+            //새로운 TimeLineLog 생성
+            if (findHistory == null || findHistory.getTimeLineLogList().isEmpty() ||
+                    findHistory.getTimeLineLogList().get(findHistory.getTimeLineLogList().size() - 1).isEnd() == true) {
 
-                    LocalDateTime startTime = LocalDateTime.now();
+                TimeLineLog timeLineLog = new TimeLineLog();
 
-                    Duration between = Duration.between(sessionStartTime, startTime);
+                LocalDateTime startTime = LocalDateTime.now();
 
-                    int hour = (int)between.getSeconds() / 3600;
-                    int minute = (int)(between.getSeconds() - 3600 * hour) / 60;
-                    int second = (int)between.getSeconds() - 3600 * hour - 60 * minute;
+                Duration between = Duration.between(sessionStartTime, startTime);
 
-                    timeLineLog.setStartHour(hour);
-                    timeLineLog.setStartMinute(minute);
-                    timeLineLog.setStartSecond(second);
+                int hour = (int) between.getSeconds() / 3600;
+                int minute = (int) (between.getSeconds() - 3600 * hour) / 60;
+                int second = (int) between.getSeconds() - 3600 * hour - 60 * minute;
 
-                    timeLineLog.setState("absence");
-                    timeLineLogRepository.save(timeLineLog);
+                timeLineLog.setStartHour(hour);
+                timeLineLog.setStartMinute(minute);
+                timeLineLog.setStartSecond(second);
 
-                    lock = true;
-                    return createOrUpdateHistory(userId, sessionId, attitude, absence, timeLineLog, pitchGraph, yawGraph);
-                }
+                timeLineLog.setState("absence");
+                timeLineLogRepository.save(timeLineLog);
 
+                return createOrUpdateHistory(userId, sessionId, attitude, absence, timeLineLog, pitchGraph, yawGraph);
             }
 
-            //자리를 비우지 않은 경우
-            else {
-                //히스토리 첫 생성
-                if (findHistory == null) ;
+        }
 
-                    //자리를 비웠다가 돌아온 경우
-                else if (!findHistory.getTimeLineLogList().isEmpty() && findHistory.getTimeLineLogList().get(findHistory.getTimeLineLogList().size() - 1).isEnd() == false) {
-                    //마지막으로 생긴 로그의 id
-                    Long timeLineLogId = findHistory.getTimeLineLogList().get(findHistory.getTimeLineLogList().size() - 1).getId();
-                    //변경 감지
-                    TimeLineLog findTimeLineLog = timeLineLogRepository.findOne(timeLineLogId);
-                    LocalDateTime endTime = LocalDateTime.now();
+        //자리를 비우지 않은 경우
+        else {
+            //히스토리 첫 생성
+            if (findHistory == null) ;
 
-                    Duration between = Duration.between(sessionStartTime, endTime);
+                //자리를 비웠다가 돌아온 경우
+            else if (!findHistory.getTimeLineLogList().isEmpty() && findHistory.getTimeLineLogList().get(findHistory.getTimeLineLogList().size() - 1).isEnd() == false) {
+                //마지막으로 생긴 로그의 id
+                Long timeLineLogId = findHistory.getTimeLineLogList().get(findHistory.getTimeLineLogList().size() - 1).getId();
+                //변경 감지
+                TimeLineLog findTimeLineLog = timeLineLogRepository.findOne(timeLineLogId);
+                LocalDateTime endTime = LocalDateTime.now();
 
-                    int hour = (int)between.getSeconds() / 3600;
-                    int minute = (int)(between.getSeconds() - 3600 * hour) / 60;
-                    int second = (int)between.getSeconds() - 3600 * hour - 60 * minute;
+                Duration between = Duration.between(sessionStartTime, endTime);
 
-                    findTimeLineLog.setEndHour(hour);
-                    findTimeLineLog.setEndMinute(minute);
-                    findTimeLineLog.setEndSecond(second);
+                int hour = (int) between.getSeconds() / 3600;
+                int minute = (int) (between.getSeconds() - 3600 * hour) / 60;
+                int second = (int) between.getSeconds() - 3600 * hour - 60 * minute;
 
-                    findTimeLineLog.setEnd(true);
-                }
+                findTimeLineLog.setEndHour(hour);
+                findTimeLineLog.setEndMinute(minute);
+                findTimeLineLog.setEndSecond(second);
 
+                findTimeLineLog.setEnd(true);
             }
-            lock = true;
-            return createOrUpdateHistory(userId, sessionId, attitude, absence, null, pitchGraph, yawGraph);
+
         }
-        else{
-            return Long.valueOf(999);
-        }
+        return createOrUpdateHistory(userId, sessionId, attitude, absence, null, pitchGraph, yawGraph);
+
 
     }
 
@@ -195,7 +189,7 @@ public class HistoryService {
             }
 
             //자리를 비운 경우에는 태도, pitch, yaw 업데이트 안함
-            if(!absence){
+            if (!absence) {
                 findHistory.setAttitude(newAttitude);
                 findHistory.setPitchGraph(newPitchGraph);
                 findHistory.setYawGraph(newYawGraph);
@@ -204,7 +198,7 @@ public class HistoryService {
             findHistory.setTimeLineLogList(newTimeLineLogList);
             findHistory.setAttendanceCount(calculateAttendance(sessionId));
             findHistory.setVibe(calculateVibe(sessionId));
-            if(getAbsenceTime(findHistory.getId()) > findSession.getGroup().getAbsenceTime())
+            if (getAbsenceTime(findHistory.getId()) > findSession.getGroup().getAbsenceTime())
                 findHistory.setAttend(false);
 
             return findHistory.getId();
@@ -235,7 +229,7 @@ public class HistoryService {
                     historyGroupMemberDtoList.add(new HistoryGroupMemberDto(
                             history1.getUser().getName(),
                             history1.getUser().getEmail(),
-                            (int)history1.getAttitude(),
+                            (int) history1.getAttitude(),
                             getAbsenceTime(history1.getId()),
                             history1.isAttend()
                     ));
@@ -253,7 +247,7 @@ public class HistoryService {
                 historyDtoList.add(new HistoryDto(GroupRole.GUEST, history.getId(),
                         history.getSession().getGroup().getName(), history.getCreatedAt().getYear(),
                         history.getCreatedAt().getMonthValue(), history.getCreatedAt().getDayOfMonth(),
-                        history.getAttendanceCount(), history.getVibe(), (int)history.getAttitude(), history.isAttend(),
+                        history.getAttendanceCount(), history.getVibe(), (int) history.getAttitude(), history.isAttend(),
                         timeLineLogRepository.findByHistory(history.getId()), history.getPitchGraph(), history.getYawGraph()));
             }
         }
@@ -353,7 +347,7 @@ public class HistoryService {
 
         List<History> findHistoryList = historyRepository.findAllGuestsInSession(sessionId);
         for (History history : findHistoryList) {
-            if(history.isAttend())
+            if (history.isAttend())
                 memberCount++;
         }
 
@@ -372,7 +366,7 @@ public class HistoryService {
 
             List<Session> findSessionList = group.getSessionList();
             //그룹의 수업이 있으면
-            if(!findSessionList.isEmpty()){
+            if (!findSessionList.isEmpty()) {
 
                 findSessionId = findSessionList.get(0).getId();
 
@@ -406,8 +400,7 @@ public class HistoryService {
         List<History> findHistoryList = findUser.getHistoryList();
 
         //Guest 이력이 없는 경우
-        if(findHistoryList.isEmpty())
-        {
+        if (findHistoryList.isEmpty()) {
             return new RecentTrendDto(GroupRole.GUEST, 0, 0);
         }
         int attendCount = 0;
