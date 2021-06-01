@@ -52,9 +52,17 @@ public class HistoryService {
                 TimeLineLog timeLineLog = new TimeLineLog();
 
                 LocalDateTime startTime = LocalDateTime.now();
-                timeLineLog.setStartHour((int) ChronoUnit.HOURS.between(sessionStartTime, startTime));
-                timeLineLog.setStartMinute((int) ChronoUnit.MINUTES.between(sessionStartTime, startTime));
-                timeLineLog.setStartSecond((int) ChronoUnit.SECONDS.between(sessionStartTime, startTime));
+
+                Duration between = Duration.between(sessionStartTime, startTime);
+
+                int hour = (int)between.getSeconds() / 3600;
+                int minute = (int)(between.getSeconds() - 3600 * hour) / 60;
+                int second = (int)between.getSeconds() - 3600 * hour - 60 * minute;
+
+                timeLineLog.setStartHour(hour);
+                timeLineLog.setStartMinute(minute);
+                timeLineLog.setStartSecond(second);
+
                 timeLineLog.setState("absence");
                 timeLineLogRepository.save(timeLineLog);
 
@@ -75,9 +83,16 @@ public class HistoryService {
                 TimeLineLog findTimeLineLog = timeLineLogRepository.findOne(timeLineLogId);
                 LocalDateTime endTime = LocalDateTime.now();
 
-                findTimeLineLog.setEndHour((int) ChronoUnit.HOURS.between(sessionStartTime, endTime));
-                findTimeLineLog.setEndMinute((int) ChronoUnit.MINUTES.between(sessionStartTime, endTime));
-                findTimeLineLog.setEndSecond((int) ChronoUnit.SECONDS.between(sessionStartTime, endTime));
+                Duration between = Duration.between(sessionStartTime, endTime);
+
+                int hour = (int)between.getSeconds() / 3600;
+                int minute = (int)(between.getSeconds() - 3600 * hour) / 60;
+                int second = (int)between.getSeconds() - 3600 * hour - 60 * minute;
+
+                findTimeLineLog.setEndHour(hour);
+                findTimeLineLog.setEndMinute(minute);
+                findTimeLineLog.setEndSecond(second);
+
                 findTimeLineLog.setEnd(true);
             }
 
