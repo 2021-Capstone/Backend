@@ -24,7 +24,7 @@ public class HistoryService {
     private final TimeLineLogRepository timeLineLogRepository;
     private final GroupService groupService;
     private final GroupRepository groupRepository;
-    private boolean lock = true;
+    private static boolean lock = true;
 
     public History findOne(Long historyId) {
         return historyRepository.findOne(historyId);
