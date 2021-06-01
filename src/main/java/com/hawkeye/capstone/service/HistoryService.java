@@ -171,10 +171,13 @@ public class HistoryService {
                 newTimeLineLogList.add(timeLineLog);
             }
 
-            findHistory.setAttitude(newAttitude);
+            //자리를 비운 경우에는 태도, pitch, yaw 업데이트 안함
+            if(!absence){
+                findHistory.setAttitude(newAttitude);
+                findHistory.setPitchGraph(newPitchGraph);
+                findHistory.setYawGraph(newYawGraph);
+            }
             findHistory.setCreatedAt(LocalDateTime.now());
-            findHistory.setPitchGraph(newPitchGraph);
-            findHistory.setYawGraph(newYawGraph);
             findHistory.setTimeLineLogList(newTimeLineLogList);
             findHistory.setAttendanceCount(calculateAttendance(sessionId));
             findHistory.setVibe(calculateVibe(sessionId));
