@@ -75,6 +75,7 @@ public class HistoryService {
 
                 //자리를 비웠다가 돌아온 경우
             else if (!findHistory.getTimeLineLogList().isEmpty() && findHistory.getTimeLineLogList().get(findHistory.getTimeLineLogList().size() - 1).isEnd() == false) {
+                //마지막으로 생긴 로그의 id
                 Long timeLineLogId = findHistory.getTimeLineLogList().get(findHistory.getTimeLineLogList().size() - 1).getId();
                 //변경 감지
                 TimeLineLog findTimeLineLog = timeLineLogRepository.findOne(timeLineLogId);
