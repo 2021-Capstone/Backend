@@ -61,6 +61,7 @@ public class SessionService {
                 int minute = (int)(between.getSeconds() - 3600 * hour) / 60;
                 int second = (int)between.getSeconds() - 3600 * hour - 60 * minute;
 
+                findTimeLineLog.setState("absence");
                 findTimeLineLog.setEnd(true);
                 findTimeLineLog.setEndHour(hour);
                 findTimeLineLog.setEndMinute(minute);

@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -197,7 +197,7 @@ public class HistoryService {
             findHistory.setTimeLineLogList(newTimeLineLogList);
             findHistory.setAttendanceCount(calculateAttendance(sessionId));
             findHistory.setVibe(calculateVibe(sessionId));
-            if (getAbsenceTime(findHistory.getId()) > findSession.getGroup().getAbsenceTime())
+            if (calculateAbsenceTime(findHistory.getId()) > findSession.getGroup().getAbsenceTime() * 60)
                 findHistory.setAttend(false);
 
             return findHistory.getId();
@@ -229,7 +229,7 @@ public class HistoryService {
                             history1.getUser().getName(),
                             history1.getUser().getEmail(),
                             (int) history1.getAttitude(),
-                            getAbsenceTime(history1.getId()),
+                            calculateAbsenceTime(history1.getId()),
                             history1.isAttend()
                     ));
 
@@ -254,7 +254,7 @@ public class HistoryService {
     }
 
     //자리비움 시간 계산
-    public int getAbsenceTime(Long historyId) {
+    public int calculateAbsenceTime(Long historyId) {
         List<TimeLineLog> findLogList = timeLineLogRepository.findByHistory(historyId);
         int time = 0;
 
@@ -262,11 +262,12 @@ public class HistoryService {
 
             if (timeLineLog.getState().equals("absence")) {
 
-                time += timeLineLog.getEndHour() - timeLineLog.getStartHour() * 60;
-                time += timeLineLog.getEndMinute() - timeLineLog.getStartMinute();
-                if (timeLineLog.getEndSecond() - timeLineLog.getStartSecond() >= 30)
-                    time += 1;
+                LocalTime startTime = LocalTime.of(timeLineLog.getStartHour(), timeLineLog.getStartMinute(), timeLineLog.getStartSecond());
+                LocalTime endTime = LocalTime.of(timeLineLog.getEndHour(), timeLineLog.getEndMinute(), timeLineLog.getEndSecond());
 
+                Duration between = Duration.between(startTime, endTime);
+
+                time += between.getSeconds();
             }
 
         }
@@ -295,7 +296,7 @@ public class HistoryService {
         for (History history : findHistoryList) {
             hostHistoryDtoList.add(new HostHistoryDto(
                     history.getId(), history.getUser().getName(), history.getUser().getEmail(),
-                    history.getVibe(), getAbsenceTime(history.getId()), history.isAttend()));
+                    history.getVibe(), calculateAbsenceTime(history.getId()), history.isAttend()));
         }
 
         return hostHistoryDtoList;
