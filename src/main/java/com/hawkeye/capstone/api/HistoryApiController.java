@@ -44,7 +44,7 @@ public class HistoryApiController {
     public synchronized CreateHistoryResponse createHistory(@RequestBody CreateOrUpdateHistoryRequest request){
 
         Long historyId = historyService.createRequest(request.userId, request.sessionId, request.pitch,
-                request.yaw, request.absence
+                request.yaw, request.absence, request.drowse
         );
 
         //그룹이 수업 중이면 endSession = false
@@ -127,6 +127,7 @@ public class HistoryApiController {
         private int pitch;
         private int yaw;
         private boolean absence;
+        private boolean drowse;
     }
 
     @Data
