@@ -394,9 +394,9 @@ public class HistoryService {
     }
 
     private PitchGraph calculatePitch(float pitch) {
-        if (pitch > 8)
+        if (pitch > 4)
             return new PitchGraph(100, 0, 0);
-        else if (pitch < 5)
+        else if (pitch < -3)
             return new PitchGraph(0, 0, 100);
         else
             return new PitchGraph(0, 100, 0);
