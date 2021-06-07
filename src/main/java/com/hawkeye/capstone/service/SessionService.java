@@ -22,6 +22,7 @@ public class SessionService {
     private final SessionRepository sessionRepository;
     private final GroupService groupService;
     private final HistoryRepository historyRepository;
+    private final HistoryService historyService;
 
     public Session findOne(Long id) {
         return sessionRepository.findOne(id);
@@ -66,6 +67,11 @@ public class SessionService {
                 findTimeLineLog.setEndMinute(minute);
                 findTimeLineLog.setEndSecond(second);
             }
+            Long findId = history.getId();
+            //변경 감지
+            History findHistory = historyRepository.findOne(findId);
+            if (historyService.calculateAbsenceTime(findHistory.getId()) > findHistory.getSession().getGroup().getAbsenceTime() * 60)
+                findHistory.setAttend(false);
         }
 
         return session.getId();
