@@ -49,7 +49,7 @@ public class SessionService {
         //변경 감지
         Group group = groupService.findOne(session.getGroup().getId());
         group.setOnAir(false);
-        //수업이 끝나도 자리 비움 상태인 히스토리 로그 수정
+        //수업이 끝나면 히스토리 로그 종료 시점 수정
         List<History> findHistoryList = historyRepository.findAllGuestsInSession(sessionId);
         for (History history : findHistoryList) {
             //히스토리 중 마지막 로그
