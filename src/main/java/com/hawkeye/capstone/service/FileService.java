@@ -33,7 +33,6 @@ import java.nio.file.*;
 import java.util.UUID;
 
 import static com.amazonaws.util.IOUtils.toByteArray;
-
 import static com.amazonaws.util.IOUtils.*;
 
 @Slf4j
