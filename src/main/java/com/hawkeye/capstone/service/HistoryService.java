@@ -331,7 +331,7 @@ public class HistoryService {
                 historyDtoList.add(new HistoryDto(GroupRole.HOST, history.getId(),
                         history.getSession().getGroup().getName(), history.getCreatedAt().getYear(),
                         history.getCreatedAt().getMonthValue(), history.getCreatedAt().getDayOfMonth(),
-                        history.getAttendanceCount(), history.getVibe(), historyGroupMemberDtoList));
+                        calculateAttendance(history.getSession().getId()), history.getVibe(), historyGroupMemberDtoList));
 
             }
 
@@ -340,7 +340,7 @@ public class HistoryService {
                 historyDtoList.add(new HistoryDto(GroupRole.GUEST, history.getId(),
                         history.getSession().getGroup().getName(), history.getCreatedAt().getYear(),
                         history.getCreatedAt().getMonthValue(), history.getCreatedAt().getDayOfMonth(),
-                        history.getAttendanceCount(), history.getVibe(), (int) history.getAttitude(), history.isAttend(),
+                        calculateAttendance(history.getSession().getId()), history.getVibe(), (int) history.getAttitude(), history.isAttend(),
                         timeLineLogRepository.findByHistory(history.getId()), history.getPitchGraph(), history.getYawGraph()));
             }
         }
