@@ -43,12 +43,13 @@ public class HistoryService {
         int attitude = calculateAttitude(pitch, drowse);
         //자리를 비운 경우
         if (absence) {
+
             //졸다가 자리를 비운 경우
-            if (!findHistory.getTimeLineLogList().isEmpty()) {
+            if (findHistory != null && !findHistory.getTimeLineLogList().isEmpty()) {
 
                 TimeLineLog lastTimeLineLog = findHistory.getTimeLineLogList().get(findHistory.getTimeLineLogList().size() - 1);
                 //마지막 log 종료되었는지 확인
-                if (!lastTimeLineLog.isEnd()) { //마지막 TimeLineLog(drowse log)가 종료되지 않았으면 종료 시킴
+                if (!lastTimeLineLog.isEnd() && !lastTimeLineLog.getState().equals("absence")) { //마지막 TimeLineLog(drowse log)가 종료되지 않았으면 종료 시킴
                     //마지막으로 생긴 로그의 id
                     Long timeLineLogId = lastTimeLineLog.getId();
                     //변경 감지
@@ -93,6 +94,11 @@ public class HistoryService {
                 return createOrUpdateHistory(userId, sessionId, attitude, absence, timeLineLog, pitchGraph, yawGraph);
             }
 
+            //계속 부재중인 경우
+            else {
+                return createOrUpdateHistory(userId, sessionId, attitude, absence, null, pitchGraph, yawGraph);
+            }
+
         }
 
         //자리를 비우지 않은 경우
@@ -100,12 +106,15 @@ public class HistoryService {
             //졸고 있는 경우
             if (drowse) { //졸기 시작
 
+
                 //자리에 돌아오자마자 조는 경우
-                if (!findHistory.getTimeLineLogList().isEmpty()) {
+                if (findHistory != null && !findHistory.getTimeLineLogList().isEmpty()) {
 
                     TimeLineLog lastTimeLineLog = findHistory.getTimeLineLogList().get(findHistory.getTimeLineLogList().size() - 1);
+
                     //마지막 log 종료되었는지 확인
-                    if (!lastTimeLineLog.isEnd()) { //마지막 TimeLineLog(absence log)가 종료되지 않았으면 종료 시킴
+                    if (!lastTimeLineLog.isEnd() && !lastTimeLineLog.getState().equals("drowse")) { //마지막 TimeLineLog(absence log)가 종료되지 않았으면 종료 시킴
+                        System.out.println("===================================");
                         //마지막으로 생긴 로그의 id
                         Long timeLineLogId = lastTimeLineLog.getId();
                         //변경 감지
@@ -127,7 +136,7 @@ public class HistoryService {
                 }
 
                 //새로운 drowse log 생성
-                if (findHistory.getTimeLineLogList().isEmpty() ||
+                if (findHistory == null || findHistory.getTimeLineLogList().isEmpty() ||
                         findHistory.getTimeLineLogList().get(findHistory.getTimeLineLogList().size() - 1).isEnd() == true) {
 
                     TimeLineLog timeLineLog = new TimeLineLog();
@@ -148,6 +157,11 @@ public class HistoryService {
                     timeLineLogRepository.save(timeLineLog);
 
                     return createOrUpdateHistory(userId, sessionId, attitude, absence, timeLineLog, pitchGraph, yawGraph);
+                }
+
+                //계속 조는 경우
+                else{
+                    return createOrUpdateHistory(userId, sessionId, attitude, absence, null, pitchGraph, yawGraph);
                 }
             }
 
