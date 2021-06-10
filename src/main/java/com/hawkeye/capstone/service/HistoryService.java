@@ -336,7 +336,7 @@ public class HistoryService {
             }
 
             //GUEST가 호출한 경우
-            else {
+            else if(userId == history.getUser().getId()){
                 historyDtoList.add(new HistoryDto(GroupRole.GUEST, history.getId(),
                         history.getSession().getGroup().getName(), history.getCreatedAt().getYear(),
                         history.getCreatedAt().getMonthValue(), history.getCreatedAt().getDayOfMonth(),
