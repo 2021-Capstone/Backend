@@ -332,7 +332,7 @@ public class HistoryService {
                         history.getSession().getGroup().getName(), history.getCreatedAt().getYear(),
                         history.getCreatedAt().getMonthValue(), history.getCreatedAt().getDayOfMonth(),
                         calculateAttendance(history.getSession().getId()), history.getVibe(), historyGroupMemberDtoList));
-
+                break;
             }
 
             //GUEST가 호출한 경우
@@ -342,6 +342,8 @@ public class HistoryService {
                         history.getCreatedAt().getMonthValue(), history.getCreatedAt().getDayOfMonth(),
                         calculateAttendance(history.getSession().getId()), history.getVibe(), (int) history.getAttitude(), history.isAttend(),
                         timeLineLogRepository.findByHistory(history.getId()), history.getPitchGraph(), history.getYawGraph()));
+
+                break;
             }
         }
         return historyDtoList;
