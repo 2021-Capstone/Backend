@@ -306,33 +306,39 @@ public class HistoryService {
         List<History> findHistoryList = historyRepository.findAll();
 
         List<HistoryDto> historyDtoList = new ArrayList<>();
-
+        Long tempSessionId = 0L;
         for (History history : findHistoryList) {
 
             //HOST가 호출한 경우
             if (userId == history.getSession().getGroup().getHostId()) {
 
-                List<HistoryGroupMemberDto> historyGroupMemberDtoList = new ArrayList<>();
+                //중복 history 제거
+                if(history.getSession().getId() != tempSessionId){
 
-                List<History> historyListInSession =
-                        historyRepository.findAllGuestsInSession(history.getSession().getId());
+                    tempSessionId = history.getSession().getId();
+                    List<HistoryGroupMemberDto> historyGroupMemberDtoList = new ArrayList<>();
 
-                for (History history1 : historyListInSession) {
+                    List<History> historyListInSession =
+                            historyRepository.findAllGuestsInSession(history.getSession().getId());
 
-                    historyGroupMemberDtoList.add(new HistoryGroupMemberDto(
-                            history1.getUser().getName(),
-                            history1.getUser().getEmail(),
-                            (int) history1.getAttitude(),
-                            calculateAbsenceTime(history1.getId()),
-                            history1.isAttend()
-                    ));
+                    for (History history1 : historyListInSession) {
+
+                        historyGroupMemberDtoList.add(new HistoryGroupMemberDto(
+                                history1.getUser().getName(),
+                                history1.getUser().getEmail(),
+                                (int) history1.getAttitude(),
+                                calculateAbsenceTime(history1.getId()),
+                                history1.isAttend()
+                        ));
+
+                    }
+                    historyDtoList.add(new HistoryDto(GroupRole.HOST, history.getId(),
+                            history.getSession().getGroup().getName(), history.getCreatedAt().getYear(),
+                            history.getCreatedAt().getMonthValue(), history.getCreatedAt().getDayOfMonth(),
+                            calculateAttendance(history.getSession().getId()), history.getVibe(), historyGroupMemberDtoList));
 
                 }
-                historyDtoList.add(new HistoryDto(GroupRole.HOST, history.getId(),
-                        history.getSession().getGroup().getName(), history.getCreatedAt().getYear(),
-                        history.getCreatedAt().getMonthValue(), history.getCreatedAt().getDayOfMonth(),
-                        calculateAttendance(history.getSession().getId()), history.getVibe(), historyGroupMemberDtoList));
-                break;
+
             }
 
             //GUEST가 호출한 경우
@@ -343,7 +349,6 @@ public class HistoryService {
                         calculateAttendance(history.getSession().getId()), history.getVibe(), (int) history.getAttitude(), history.isAttend(),
                         timeLineLogRepository.findByHistory(history.getId()), history.getPitchGraph(), history.getYawGraph()));
 
-                break;
             }
         }
         return historyDtoList;
