@@ -44,6 +44,7 @@ cloud:
       bucket: capstone-image
       url: https://s3.ap-northeast-2.amazonaws.com/capstone-image/
 
+
 app:
   upload:
     dir: C:\Users\KJH\Documents\Capstone\Backend-master\image
